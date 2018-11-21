@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.min.css">
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.colors.min.css">
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7-icons.css">
+    <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+    </script>
     <style>
         img.button-img {
             max-width: 100%;
@@ -65,7 +71,7 @@
                     <span id="cal">cal</span>
                 </div>
                 <div id="formula">
-                    $0$
+                    $x^2$
                 </div>
                 <div class="result" id="result">
                    <span></span>
@@ -256,7 +262,7 @@
                         </a>
                     </div>
                     <div class="col-20 button-img">
-                        <a class="button button-fill color-black">
+                        <a class="button button-fill color-black" onclick="calculate(currentFormula)">
                             <span class="supright">$=$</span>
                         </a>
                     </div>
@@ -316,12 +322,9 @@
       </div>
     </div>
     <script type="text/javascript" src="Framework7-1.4.2/dist/js/framework7.min.js"></script>
-    <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/math.js"></script>
-    <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
-    </script>
+    <script type="text/javascript" src="js/myMath.js"></script>
     <script>
     </script>
   </body>
