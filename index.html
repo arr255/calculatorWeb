@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.min.css">
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.colors.min.css">
     <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7-icons.css">
+    <link rel="icon" href='src/favicon.png' type="image/x-icon">
+    <link rel='short-cut icon' href='src/favicon.png' type="image/x-icon">  
     <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
@@ -51,7 +53,7 @@
             height:65%;
             text-align: left;
             padding-top:5%;
-            font-size: 32px;
+            font-size: 24px;
         }
         #status{
             height:5%;
@@ -69,9 +71,10 @@
             <div class="mainShow" id="mainShow">
                 <div class="status" id="status">
                     <span id="cal">cal</span>
+                    <span id="rad">rad</span>
                 </div>
                 <div id="formula">
-                    $x^2$
+                    ${\color{yellow}|}$
                 </div>
                 <div class="result" id="result">
                    <span></span>
@@ -112,7 +115,7 @@
                         </a>
                     </div>
                     <div class="col-20 button-img">
-                        <a class="button button-fill">
+                        <a class="button button-fill" onclick="moveLeft(1)">
                             <span><i class="f7-icons">chevron_left</i></span>
                         </a>
                     </div>
@@ -122,7 +125,7 @@
                         </a>
                     </div>
                     <div class="col-20 button-img">
-                        <a class="button button-fill">
+                        <a class="button button-fill" onclick="moveRight(1)">
                             <span><i class="f7-icons">chevron_right</i></span>
                         </a>
                     </div>
