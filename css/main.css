@@ -1,0 +1,47 @@
+img.button-img {
+    max-width: 100%;
+    max-height: 100%;
+}
+div.button-img {
+  
+}
+span.supleft {
+    padding-right:0%;
+}
+span.supright {
+    padding-left: -40%;
+}
+div.keyboard{
+    height:70%;
+}
+div.mainShow{
+    height:30%;
+    background-color: black;
+}
+div.views{
+
+}
+#result{
+    color:cyan;
+    height:30%;
+    margin-top: -5%;
+    text-align: right;
+    font-size:48px;
+}
+#formula{
+    color:cyan;
+    height:65%;
+    text-align: left;
+    padding-top:5%;
+    font-size: 24px;
+}
+#status{
+    height:5%;
+    color:cyan;
+    margin-top: 0;
+    font-size: 12px;
+}
+
+body{
+    opacity: 0;
+}
