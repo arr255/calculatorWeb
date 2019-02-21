@@ -1,3 +1,5 @@
+
+
 var myApp = new Framework7();
 var mainView = myApp.addView('.view');
 mainView.router.load("heel");
@@ -8,6 +10,8 @@ var cursor="{\\color{yellow}|}"
 var initFormula="$"+cursor+"$"
 var currentFormula=initFormula;
 var page=1;//切换页面,取值为1,2,3,4
+var maxBrackets=0;//最大嵌套的括号层数
+var cursorOnTheLine=false;//光标是否在线上内
 init();
 /*
     init初始化
@@ -18,19 +22,72 @@ function init(){
     $$("a").children().css("position","relative");
     $$("a").children().css("top",buttonHeight/3+"px");
 }
-function changeFormula(formula,leftMove=0,RightMove=0,boxed=0,curelyBrackets=0){
-    //删除末尾花括号(如果有需要)
-    if(curelyBrackets){
-        currentFormula=currentFormula.Substring(0,currentFormula.Length-1);
+/*changeFormula()：按键后公式变动
+    参数：formula:前端传入参数;
+    leftMove:左移数目;RightMove:右移数目;cursorOnLine:是否在线上，改变全局变量;firstPara:第一个参数位置;
+*/
+function changeFormula(formula,arg={}){
+    var RightMove=arg["RightMove"];
+    if(arg["cursorOnTheLine"]){
+        cursorOnTheLine=arg["cursorOnTheLine"];
     }
-    //获取当前光标位置$xxxcursor
+    var firstPara=arg["firstPara"];
+    var leftMove=arg["leftMove"];
+    //获取添加后的光标位置
     var cursorLocation=currentFormula.indexOf(cursor);
     currentFormula=insertStr(currentFormula,cursorLocation,formula);
-    //添加末尾花括号(如果有需要)
-    if(curelyBrackets){
-        currentFormula=currentFormula+"}";
+    //获取添加后的光标位置
+    var cursorLocation=currentFormula.indexOf(cursor);
+    if(leftMove>0){
+        currentFormula=currentFormula.replace(cursor,"");
+        currentFormula=insertStr(currentFormula,cursorLocation-leftMove,cursor);
     }
     //重新显示
+    reload();
+}
+/*
+    addFrac()
+    添加分数
+*/
+function addFrac(){
+    var firstParaStr="";//获取的第一个参数
+    var bracketsNumber=0;//括号层数
+    var cursorLocation=currentFormula.indexOf(cursor);//光标位置
+    for(var i=cursorLocation-1;i>0;i--){
+        var reg=/[\+|\-|\*|\/|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
+        var currentChar=String(currentFormula[i]);
+        console.log(currentFormula);
+        if(currentChar.match(reg)){//如果匹配到结束符
+            if(bracketsNumber==0){//如果不在括号内
+                break;
+            }
+            else{//如果在括号内
+                firstParaStr=currentFormula[i]+firstParaStr;
+                bracketsNumber-=1;
+            }
+        }
+        else if((currentChar.match(/[\)]/))){//进入括号
+            firstParaStr=currentFormula[i]+firstParaStr;
+            bracketsNumber+=1;
+        }
+        else{
+            firstParaStr=currentFormula[i]+firstParaStr;
+        }
+    }
+    currentFormula=currentFormula.substr(0,i+1)+currentFormula.substr(cursorLocation);
+    cursorLocation=currentFormula.indexOf(cursor);
+    // alert(currentFormula);
+    if(firstParaStr==""){//如果未找到参数
+        currentFormula=currentFormula.replace(cursor,"");//删除光标
+        currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{\\underline{"+cursor+"}}{\\underline{}}");
+        cursorOnTheLine=true;
+    }
+    else{
+        currentFormula=currentFormula.replace(cursor,"");
+        currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{"+firstParaStr+"}{\\underline{"+cursor+"}}");
+        cursorOnTheLine=true;
+    }
+    console.log("firstParaStr:"+firstParaStr);
     reload();
 }
 function shiftButton(){
@@ -141,14 +198,15 @@ function moveRight(rm){
             if(cursorLocation+1<currentFormula.length){
                 testChar=currentFormula.charAt(cursorLocation);
                 testChar2=currentFormula.charAt(cursorLocation-1);
-                if(testChar.match(/\(/)){   
-                    if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z]/)){
+                if(testChar.match(/[\(]/)){   
+                    if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z|]/)){
                         cursorLocation+=1;
                         rm-=1;
                     }
                 }
-                else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/\\/)){
+                else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/[\\|}]/)){
                     cursorLocation+=1;
+                    console.log(testChar+cursorLocation);
                 }
                 else{
                     cursorLocation+=1;
@@ -159,9 +217,35 @@ function moveRight(rm){
                 break;
             }
         }
+        console.log(currentFormula);
         currentFormula=insertStr(currentFormula,cursorLocation,cursor);
+        //假如进入下划线
+        var regCursor="\\{\\\\color\\{yellow\\}\\|\\}"
+        reg=new RegExp(regCursor+"\\\\underline\\{");
+        currentFormula=currentFormula.replace(reg,"\\underline{"+cursor);
+        //加入进入排列组合上部分
+        reg=new RegExp("([C|P])_\\{(.+?)\\}\\^"+regCursor+"\\{");
+        currentFormula=currentFormula.replace(reg,"$1\_\{$2\}\^\{"+cursor);
+        console.log(currentFormula);
+        //去除下划线
+        // if(cursorOnTheLine){
+        //     var reg=new RegExp("\\\\underline\\{(.+)\\}(?="+cursor+")");
+        //     console.log(reg);
+        //     currentFormula=currentFormula.replace(reg,"$1");
+        //     cursorOnTheLine=false;
+        // }
+        currentFormula=deleteUnderline(currentFormula);
         reload();
     }
+}
+/*
+    deleteUnderline()
+*/
+function deleteUnderline(str){
+        var reg=new RegExp("\\\\underline\\{(.+?)\\}");
+        str=str.replace(reg,"$1");
+        cursorOnTheLine=false;
+    return str;
 }
 /*
     insertStr(str,location,insertContent)
@@ -186,8 +270,9 @@ function strPreHandle(formula){
  ******************************/
 //主计算函数
 function calculate(string){
-    console.log("recievedString:"+string);
     string=handleString(string);
+    //string=string.replace(/\(|\)/g,"");//去除括号；
+    console.log("Foreeval:"+string);
     var result=eval(string);
     ApproResult=math.round(parseFloat(result),7);
     if(ApproResult){
@@ -197,8 +282,74 @@ function calculate(string){
         var reg = new RegExp('"',"g");
         result=String(result).replace(reg,"")
     }
-    console.log(string);
-   $$("#result").text(ApproResult);
+    return ApproResult;
+}
+/*
+    mainCalculate(formula):主处理函数，进行括号迭代
+    参数：待处理式子
+    返回值：最终计算结果
+*/
+function mainCalculate(formula){
+    console.log("recievedString:"+formula);
+    //第一次处理，将常数转换
+    string=handleConst(formula);
+    //第二次处理，添加标号
+    string=handleBrackets(formula);
+    formula=handleBrackets(formula);
+    maxBrackets=1;
+    for(var i=maxBrackets;i>=0;i--){
+        //字符串需要加上双重转义字符
+        var signal="\\["+String(i)+"\\]";
+        var reg=new RegExp("("+signal+"\\("+")"+"(.+?)"+"("+signal+"\\))",'g');
+        var signalReg=new RegExp(signal,"g");
+        formula.match(reg);
+        var handledResult=String(calculate(RegExp.$2));//括号内计算结果
+        formula.match(reg);  //重新赋值
+        formula=formula.replace(reg,RegExp.$1+handledResult+RegExp.$3).replace(signalReg,"");
+        console.log("result:"+formula);
+    }
+    var finalResult=calculate(formula);
+    //alert(finalResult);
+    $$("#result").text(finalResult);
+
+}
+/*
+    handleConst(formula):常数处理,将pi、e变为数字，便于后续处理
+    参数：待处理式子
+    返回值：处理后式子
+*/
+function handleConst(formula){
+    formula=formula.replace("\\pi",Math.PI).replace("\\mathrm{e}",Math.E);
+    console.log("handledConst",formula);
+    return formula;
+}
+/*
+    handleBrackets(formula):处理括号嵌套问题,更改maxBrackets值
+    参数：待处理式子
+    返回值：处理后的式子 例如\sin(\sin(0))处理为\sin[0](\sin[1](0[1])[0])
+*/
+function handleBrackets(formula){
+    var formulaLength=formula.length;
+    var result="";
+    var controlNumber=-1;
+    for(i=0;i<formulaLength;i++){
+        if(formula[i]!="(" && formula[i] != ")"){
+            result+=formula[i];
+        }
+        else if(formula[i]=="("){
+            controlNumber+=1;
+            if(controlNumber>maxBrackets){
+                maxBrackets=controlNumber;
+            }
+            result=result+"["+String(controlNumber)+"](";
+        }
+        else if(formula[i]==")"){
+            result=result+"["+String(controlNumber)+"])";
+            controlNumber-=1;
+        }
+    }
+    console.log("handledBrackets:"+result);
+    return result;
 }
 /*
     handleString:字符串处理
@@ -208,19 +359,34 @@ function handleString(str){
     //删除光标
     str=str.replace(cursor,"");
     str=str.replace(/\$/g,"");
+    //删除下划线
+    str=str.replace(/\\underline\{(.+?)\}/,"$1");
+
+    //排列组合处理
+    str=str.replace(/C_\{(.+?)\}\^\{(.+?)\}/,"math.combinations($1,$2)");
+    str=str.replace(/P_\{(.+?)\}\^\{(.+?)\}/,"math.permutations($1,$2)");
+    //加减乘除处理
     str=str.replace(/\\mathrm\{\+\}/g,"+");//替换加号;
     str=str.replace(/\\mathrm\{\-\}/g,"-");//替换减号；
     str=str.replace(/\\pi/g,3.14159265359);//替换PI
     str=str.replace(/\\mathrm\{e\}/g,"2.718281828459");//替换自然对数E；
     str=str.replace(/\\times/g,"*");
     str=str.replace(/\\div/,"/");
-    str=str.replace(/\\sin/g,"math.sin");
-    str=str.replace(/\\cos/g,"math.cos");
-    str=str.replace(/\\tan/g,"math.tan");
-    str=str.replace(/\\arcsin/g,"math.asin");
-    str=str.replace(/\\arccos/,"math.acos");
-    str=str.replace(/\\arctan/,"math.atan");
-    str=str.replace(/\\log/g,"lg");//替换以十为底的对数
+    //三角函数处理
+    str=str.replace(/(\\sin\()(.+?)\)/g,"math.sin($2)");
+    str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
+    str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
+    str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
+    str=str.replace(/(\\arccos\()(.+?)\)/g,"math.acos($2)");
+    str=str.replace(/(\\arctan\()(.+?)\)/g,"math.atan($2)");
+    str=str.replace(/(\\log\()(.+?)\)/g,"lg($2)");//替换以十为底的对数
+    //third row
+    str=str.replace(/(\\ln\()(.+?)(\))/g,"math.log($2,math.e)");
+    //fourth row
+    str=str.replace(/\(?([\d|\.]+)\)?\^\{?\(?(\-?[\d|\.]+)\)?\}?/g,"math.pow($1,$2)");
+    str=str.replace(/\\sqrt\[(.+?)\]\{(.+?)\}/g,"root($2,$1)");
+    //fifth row
+    str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"math.divide($1,$2)");
     console.log("handledString:"+str);
     return str;
 }
@@ -235,7 +401,6 @@ function reload(){
     MathJax.Hub.Queue(function () {
         $$("#formula").css("opacity",1);
       });
-    console.log("currentFormula:"+currentFormula);
     setTimeout(function(){
         $$("#formula").css("color","cyan");
     },100);

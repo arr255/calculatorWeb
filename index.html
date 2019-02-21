@@ -137,7 +137,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[2]{\\boxed{}}')">
+                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[2]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
                                         <span>$\sqrt[]{}$</span>
                                     </a>
                                 </div>
@@ -228,7 +228,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="calculate(currentFormula)">
+                                    <a class="button button-fill color-black" onclick="mainCalculate(currentFormula)">
                                         <span class="supright">$=$</span>
                                     </a>
                                 </div>
@@ -369,18 +369,18 @@
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('x')">
-                                        <span>$x$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('^{-1}')">
+                                        <span>$x^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^2')">
-                                        <span>$x^2$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('^3')">
+                                        <span>$x^3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[2]{\\boxed{}}')">
-                                        <span>$\sqrt[]{}$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[3]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
+                                        <span>$\sqrt[3]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
@@ -411,13 +411,13 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\times')">
-                                        <span class="supright">$\times \ ^{\tiny {\color{silver} {X^{n}}}}$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('^{\\underline{}}',leftMove=2,cursorOnTheLine=true)">
+                                        <span class="supright">$x^n \ ^{\tiny {\color{silver} {\times}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\div')">
-                                        <span class="supright">$\div \ ^{\tiny \color{silver}{\frac{\boxed{}}{\boxed{}}}}$</span>
+                                    <a class="button button-fill color-black" onclick="addFrac()">
+                                        <span class="supright">$\frac{\boxed{}}{\boxed{}}\ ^{\tiny \color{silver}{\div}}$</span>
                                     </a>
                                 </div>
                             </div>
@@ -438,13 +438,13 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{+}')">
-                                        <span class="supright">$+ \ ^{\small {\color{silver} {C_n^k}}}$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('C_{}^{}',{leftMove:4})">
+                                        <span class="supright">$C_n^k \ ^{\small {\color{silver} {+}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{-}')">
-                                        <span class="supright">$- \ ^{\small {\color{silver}{P_{n}^{k}}}}$</span>
+                                    <a class="button button-fill color-black" onclick="changeFormula('P_{}^{}',{leftMove:4})">
+                                        <span class="supright">$P_{n}^{k} \ ^{\small {\color{silver}{-}}}$</span>
                                     </a>
                                 </div>
                             </div>
@@ -470,7 +470,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="calculate(currentFormula)">
+                                    <a class="button button-fill color-black" onclick="mainCalculate(currentFormula)">
                                         <span class="supright">$=$</span>
                                     </a>
                                 </div>

@@ -17,3 +17,9 @@ function NPr(x){
     return "error";
     }
 }
+function root(a,root){
+    if(root==0){
+        alert("错误算式");
+    }
+    return math.pow(a,1/root);
+}
