@@ -6,12 +6,18 @@ mainView.router.load("heel");
 var height=document.documentElement.clientHeight;
 var $$=Dom7;
 var buttonHeight=height*0.7/9;
-var cursor="{\\color{yellow}|}"
+var cursor="{\\color{yellow}|}";
+var regCursor="\\{\\\\color\\{yellow\\}\\|\\}";
 var initFormula="$"+cursor+"$"
 var currentFormula=initFormula;
 var page=1;//切换页面,取值为1,2,3,4
 var maxBrackets=0;//最大嵌套的括号层数
 var cursorOnTheLine=false;//光标是否在线上内
+var Already=true;//上一次计算完成
+var recordNumber=0;//记录条数
+var logFormula="";//记录的公式
+var logResult="";//记录的结果
+var currentLog=localStorage.length;//当前记录
 init();
 /*
     init初始化
@@ -27,12 +33,16 @@ function init(){
     leftMove:左移数目;RightMove:右移数目;cursorOnLine:是否在线上，改变全局变量;firstPara:第一个参数位置;
 */
 function changeFormula(formula,arg={}){
-    var RightMove=arg["RightMove"];
-    if(arg["cursorOnTheLine"]){
-        cursorOnTheLine=arg["cursorOnTheLine"];
+    if(Already){
+        $$("#result").text("");
+        $$("formula").text(initFormula);
+        currentFormula=initFormula;
+        Already=false;
     }
+    var RightMove=arg["RightMove"];
     var firstPara=arg["firstPara"];
     var leftMove=arg["leftMove"];
+    //删除underline
     //获取添加后的光标位置
     var cursorLocation=currentFormula.indexOf(cursor);
     currentFormula=insertStr(currentFormula,cursorLocation,formula);
@@ -42,6 +52,7 @@ function changeFormula(formula,arg={}){
         currentFormula=currentFormula.replace(cursor,"");
         currentFormula=insertStr(currentFormula,cursorLocation-leftMove,cursor);
     }
+    currentFormula=deleteUnderline(currentFormula);
     //重新显示
     reload();
 }
@@ -101,11 +112,49 @@ function shiftButton(){
     }
 }
 /*
+    upButtonClick()
+    上方向键按下
+*/
+function upButtonClick(){
+    if(Already){
+        if(currentLog>0){
+            currentFormula=localStorage.key(currentLog);
+            result=localStorage.getItem(currentFormula);
+            currentLog-=1
+            $$("#result").text(result);
+            reload();
+        }
+    }
+    else{
+        moveLeft(1);
+    }
+}
+/*
+    downButtonClick()
+    下方向键按下
+*/
+function downButtonClick(){
+    if(Already){
+        if(currentLog<localStorage.length){
+            currentFormula=localStorage.key(currentLog);
+            result=localStorage.getItem(currentFormula);
+            currentLog+=1;
+            $$("#result").text(result);
+            reload();
+        }
+    }
+    else{
+        moveRight(1);
+    }
+}
+/*
     AC按键按下，清空内容，返回为0
     返回：无
 */
 function clearContent(){
     currentFormula="$"+cursor+"$";
+    Already=true;
+    currentLog=localStorage.length;
     reload();
 }
 /* 删除
@@ -150,44 +199,36 @@ function del(del=1){
         }
 }
 /*
+    clearHistory()
+    清除历史记录
+*/
+function clearHistory(){
+    localStorage.clear();
+    alert("历史记录已清空");
+}
+/*
     光标左移
     参数：左移位数
     返回：无
 */
 function moveLeft(lm){
-    currentFormula=strPreHandle(currentFormula);
-    //获取当前光标位置$xxxcursor
-    var cursorLocation=currentFormula.indexOf(cursor);
-    if(cursorLocation>0){
-        currentFormula=currentFormula.replace(cursor,"");
-        //寻找合适的光标位置
-        //排除A-Z、a-z、/、[a-z]( 、[A-Z](
-        while(lm){
-            if(cursorLocation<2){
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^","\\\\sqrt\\[2]\\{\\\\underline\\{"]
+    while(lm>0){
+        for(i=0;i<wholeSingnal.length;i++){
+            var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
+            if(currentFormula.match(reg)){
+                currentFormula=currentFormula.replace(reg,"$2$1");
+                lm-=1;
                 break;
             }
-            testChar=currentFormula.charAt(cursorLocation-1);
-            if(cursorLocation>2){
-                testChar2=currentFormula.charAt(cursorLocation-2);
-            }
-            if(testChar.match(/\(/)){   
-                if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z]/)){
-                    cursorLocation-=1;
-                }
-            }
-            else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/\\/)){
-                cursorLocation-=1;
-            }
-            else{
-                cursorLocation-=1;
-                lm-=1;
-            }
         }
-        currentFormula=insertStr(currentFormula,cursorLocation,cursor);
-        currentFormula=currentFormula.replace(/ /g,"");
-        reload();
+        lm-=1;
     }
-}
+    console.log("moveLefted:"+currentFormula);
+    Already=false;
+    reload();
+    }
 function moveRight(rm){
     //currentFormula=strPreHandle(currentFormula);
     //获取当前光标位置$xxxcursor
@@ -220,7 +261,6 @@ function moveRight(rm){
         console.log(currentFormula);
         currentFormula=insertStr(currentFormula,cursorLocation,cursor);
         //假如进入下划线
-        var regCursor="\\{\\\\color\\{yellow\\}\\|\\}"
         reg=new RegExp(regCursor+"\\\\underline\\{");
         currentFormula=currentFormula.replace(reg,"\\underline{"+cursor);
         //加入进入排列组合上部分
@@ -235,6 +275,7 @@ function moveRight(rm){
         //     cursorOnTheLine=false;
         // }
         currentFormula=deleteUnderline(currentFormula);
+        Already=false;
         reload();
     }
 }
@@ -242,9 +283,8 @@ function moveRight(rm){
     deleteUnderline()
 */
 function deleteUnderline(str){
-        var reg=new RegExp("\\\\underline\\{(.+?)\\}");
-        str=str.replace(reg,"$1");
-        cursorOnTheLine=false;
+    var reg=new RegExp("\\\\underline\\{(.+?)"+regCursor+"\\}");
+    str=str.replace(reg,"$1"+cursor);
     return str;
 }
 /*
@@ -262,7 +302,7 @@ function insertStr(str,location,insertContent){
     返回值：处理后的字符串
 */
 function strPreHandle(formula){
-    formula=formula.replace(/\\pi/g," \\pi");
+    formula=formula.replace(/ /g,"");
     return formula;
 }
 /*******************************
@@ -291,6 +331,8 @@ function calculate(string){
 */
 function mainCalculate(formula){
     console.log("recievedString:"+formula);
+    logFormula=formula.replace(cursor,"");
+    localStorage.setItem(logFormula,"");
     //第一次处理，将常数转换
     string=handleConst(formula);
     //第二次处理，添加标号
@@ -311,7 +353,10 @@ function mainCalculate(formula){
     var finalResult=calculate(formula);
     //alert(finalResult);
     $$("#result").text(finalResult);
-
+    Already=true;
+    logResult=finalResult;
+    localStorage.setItem(logFormula,logResult);
+    currentLog=localStorage.length;
 }
 /*
     handleConst(formula):常数处理,将pi、e变为数字，便于后续处理

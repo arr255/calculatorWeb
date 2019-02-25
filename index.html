@@ -56,7 +56,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill">
+                                    <a class="button button-fill" onclick="upButtonClick()">
                                         <span><i class="f7-icons">chevron_up</i></span>
                                     </a>
                                 </div>
@@ -82,7 +82,7 @@
                                         <span><i class="f7-icons">chevron_left</i></span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img">
+                                <div class="col-20 button-img" onclick="downButtonClick()">
                                     <a class="button button-fill">
                                         <span><i class="f7-icons">chevron_down</i></span>
                                     </a>
@@ -93,7 +93,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill">
+                                    <a class="button button-fill" onclick="clearHistory()">
                                         <span><i class="f7-icons">time</i></span>
                                     </a>
                                 </div>
@@ -127,7 +127,7 @@
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('x')">
+                                    <a class="button button-fill color-black" onclick="changeFormula('{\\color{pink}x}')">
                                         <span>$x$</span>
                                     </a>
                                 </div>
@@ -169,12 +169,12 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\times')">
+                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\times}')">
                                         <span class="supright">$\times \ ^{\tiny {\color{silver} {X^{n}}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\div')">
+                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\div}')">
                                         <span class="supright">$\div \ ^{\tiny \color{silver}{\frac{\boxed{}}{\boxed{}}}}$</span>
                                     </a>
                                 </div>
