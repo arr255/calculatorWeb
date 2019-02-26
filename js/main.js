@@ -63,7 +63,7 @@ function addFrac(){
     var bracketsNumber=0;//括号层数
     var cursorLocation=currentFormula.indexOf(cursor);//光标位置
     for(var i=cursorLocation-1;i>0;i--){
-        var reg=/[\+|\-|\*|\/|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
+        var reg=/[\\mathrm\{\+\}|\\mathrm\{\-\}|\\mathrm\{\\times\}|\\mathrm\{\\div\}|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
         var currentChar=String(currentFormula[i]);
         console.log(currentFormula);
         if(currentChar.match(reg)){//如果匹配到结束符
@@ -98,6 +98,21 @@ function addFrac(){
     }
     console.log("firstParaStr:"+firstParaStr);
     reload();
+}
+/*
+    searchFirstPara(formula):寻找前一个参数
+*/
+function searchFirstPara(formula){
+    //若前一个参数为空
+    var blackSignal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}"];
+    for(i=0;i<blackSignal.length;i++){
+        if(formula.match(blackSignal+regCursor)){
+            return false;
+        }
+    }
+    //前一个参数为数字或常数
+    reg=RegExp("([0-9|.|\\\\pi|\\\\mathrm\\{e}|Res])"+regCursor);
+    
 }
 function shiftButton(){
     if(page==1){
@@ -227,13 +242,6 @@ function moveLeft(lm){
     Already=false;
     reload();
     }
-/* 
-    absMoveLeft(lm):固定左移
-    参数：lm:左移字符数目
-*/
-function absMoveLeft(lm){
-
-}
 function moveRight(rm){
     //currentFormula=strPreHandle(currentFormula);
     //获取当前光标位置$xxxcursor
