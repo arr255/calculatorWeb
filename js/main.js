@@ -1,5 +1,3 @@
-
-
 var myApp = new Framework7();
 var mainView = myApp.addView('.view');
 mainView.router.load("heel");
@@ -213,7 +211,7 @@ function clearHistory(){
 */
 function moveLeft(lm){
     var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
-                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^","\\\\sqrt\\[2]\\{\\\\underline\\{"]
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)"]
     while(lm>0){
         for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
@@ -229,6 +227,13 @@ function moveLeft(lm){
     Already=false;
     reload();
     }
+/* 
+    absMoveLeft(lm):固定左移
+    参数：lm:左移字符数目
+*/
+function absMoveLeft(lm){
+
+}
 function moveRight(rm){
     //currentFormula=strPreHandle(currentFormula);
     //获取当前光标位置$xxxcursor
@@ -406,10 +411,12 @@ function handleString(str){
     str=str.replace(/\$/g,"");
     //删除下划线
     str=str.replace(/\\underline\{(.+?)\}/,"$1");
-
+    //处理加减乘除
+    str=str.replace(/\\mathrm{\\times}/g,"*");
+    str=str.replace(/\\mathrm{\\div}/g,"/");
     //排列组合处理
-    str=str.replace(/C_\{(.+?)\}\^\{(.+?)\}/,"math.combinations($1,$2)");
-    str=str.replace(/P_\{(.+?)\}\^\{(.+?)\}/,"math.permutations($1,$2)");
+    str=str.replace(/C_\{(.+?)\}\^\{(.+?)\}/g,"math.combinations($1,$2)");
+    str=str.replace(/P_\{(.+?)\}\^\{(.+?)\}/g,"math.permutations($1,$2)");
     //加减乘除处理
     str=str.replace(/\\mathrm\{\+\}/g,"+");//替换加号;
     str=str.replace(/\\mathrm\{\-\}/g,"-");//替换减号；
