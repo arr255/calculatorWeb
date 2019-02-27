@@ -59,6 +59,7 @@ function changeFormula(formula,arg={}){
     添加分数
 */
 function addFrac(){
+    searchFirstPara(currentFormula);
     var firstParaStr="";//获取的第一个参数
     var bracketsNumber=0;//括号层数
     var cursorLocation=currentFormula.indexOf(cursor);//光标位置
@@ -98,6 +99,44 @@ function addFrac(){
     }
     console.log("firstParaStr:"+firstParaStr);
     reload();
+}
+/*
+    searchFirstPara(formula)
+    寻找参数，用于分数
+    返回值：第一个参数字符串
+*/
+function searchFirstPara(formula){
+    //如果第一个参数为空为空,包括加减乘除、左括号，$，
+    reg=RegExp("[\\\\mathrm\\{\\+}|\\\\mathrm\\{-\\}|\\\\mathrm\\{\\\\times\\}|\\\\mathrm\\{\\\\div\\}|\\(|\\$]"+regCursor)
+    if(formula.match(reg)){
+        return "";
+    }
+    //如果第一个参数为数字
+    reg=RegExp("([\\d|\\.]+)"+regCursor)
+    if(formula.match(reg)){
+        return RegExp.$1;
+    }
+    //如果第一个参数为常数
+    reg=RegExp("([\\\\pi|(\\\\mathrm\\{e\\})])"+regCursor);
+    if(formula.match(reg)){
+        alert(RegExp.$1);
+        return RegExp.$1;
+    }
+    //如果匹配的为括号
+    reg=RegExp("\\)"+regCursor);
+    if(formula.match(reg)){
+        var handleBracketsStr=handleBrackets(formula);
+        reg=RegExp("\\[(\\d+?)\\]\\)"+regCursor);
+        handleBracketsStr.match(reg);
+        var bracketsNumber=RegExp.$1;
+        reg=RegExp("\\["+bracketsNumber+"\\](.+?\\["+bracketsNumber+"\\]\\))"+regCursor);
+        handleBracketsStr.match(reg);
+        var firstParaWithSignal=RegExp.$1;
+        var firstPara=firstParaWithSignal.replace(/\\[.+?\\]/g,"");
+        console.log(firstPara);
+        //判断是否为函数
+        reg=RegExp("([])")
+    }
 }
 function shiftButton(){
     if(page==1){
