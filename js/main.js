@@ -59,45 +59,53 @@ function changeFormula(formula,arg={}){
     添加分数
 */
 function addFrac(){
-    searchFirstPara(currentFormula);
-    var firstParaStr="";//获取的第一个参数
-    var bracketsNumber=0;//括号层数
-    var cursorLocation=currentFormula.indexOf(cursor);//光标位置
-    for(var i=cursorLocation-1;i>0;i--){
-        var reg=/[\+|\-|\*|\/|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
-        var currentChar=String(currentFormula[i]);
-        console.log(currentFormula);
-        if(currentChar.match(reg)){//如果匹配到结束符
-            if(bracketsNumber==0){//如果不在括号内
-                break;
-            }
-            else{//如果在括号内
-                firstParaStr=currentFormula[i]+firstParaStr;
-                bracketsNumber-=1;
-            }
-        }
-        else if((currentChar.match(/[\)]/))){//进入括号
-            firstParaStr=currentFormula[i]+firstParaStr;
-            bracketsNumber+=1;
-        }
-        else{
-            firstParaStr=currentFormula[i]+firstParaStr;
-        }
-    }
-    currentFormula=currentFormula.substr(0,i+1)+currentFormula.substr(cursorLocation);
-    cursorLocation=currentFormula.indexOf(cursor);
-    // alert(currentFormula);
-    if(firstParaStr==""){//如果未找到参数
-        currentFormula=currentFormula.replace(cursor,"");//删除光标
-        currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{\\underline{"+cursor+"}}{\\underline{}}");
-        cursorOnTheLine=true;
+    // searchFirstPara(currentFormula);
+    // var firstParaStr="";//获取的第一个参数
+    // var bracketsNumber=0;//括号层数
+    // var cursorLocation=currentFormula.indexOf(cursor);//光标位置
+    // for(var i=cursorLocation-1;i>0;i--){
+    //     var reg=/[\+|\-|\*|\/|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
+    //     var currentChar=String(currentFormula[i]);
+    //     console.log(currentFormula);
+    //     if(currentChar.match(reg)){//如果匹配到结束符
+    //         if(bracketsNumber==0){//如果不在括号内
+    //             break;
+    //         }
+    //         else{//如果在括号内
+    //             firstParaStr=currentFormula[i]+firstParaStr;
+    //             bracketsNumber-=1;
+    //         }
+    //     }
+    //     else if((currentChar.match(/[\)]/))){//进入括号
+    //         firstParaStr=currentFormula[i]+firstParaStr;
+    //         bracketsNumber+=1;
+    //     }
+    //     else{
+    //         firstParaStr=currentFormula[i]+firstParaStr;
+    //     }
+    // }
+    // currentFormula=currentFormula.substr(0,i+1)+currentFormula.substr(cursorLocation);
+    // cursorLocation=currentFormula.indexOf(cursor);
+    // // alert(currentFormula);
+    // if(firstParaStr==""){//如果未找到参数
+    //     currentFormula=currentFormula.replace(cursor,"");//删除光标
+    //     currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{\\underline{"+cursor+"}}{\\underline{}}");
+    //     cursorOnTheLine=true;
+    // }
+    // else{
+    //     currentFormula=currentFormula.replace(cursor,"");
+    //     currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{"+firstParaStr+"}{\\underline{"+cursor+"}}");
+    //     cursorOnTheLine=true;
+    // }
+    // console.log("firstParaStr:"+firstParaStr);
+    var firstPara=searchFirstPara(currentFormula);
+    if(!firstPara){
+        changeFormula("\\frac{\\underline{}}{}",{leftMove:4});
     }
     else{
-        currentFormula=currentFormula.replace(cursor,"");
-        currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{"+firstParaStr+"}{\\underline{"+cursor+"}}");
-        cursorOnTheLine=true;
+        currentFormula=currentFormula.replace(firstPara,"");
+        changeFormula("\\frac{"+firstPara+"}{\\underline{}}",{leftMove:2});
     }
-    console.log("firstParaStr:"+firstParaStr);
     reload();
 }
 /*
@@ -107,19 +115,19 @@ function addFrac(){
 */
 function searchFirstPara(formula){
     //如果第一个参数为空为空,包括加减乘除、左括号，$，
-    reg=RegExp("[\\\\mathrm\\{\\+}|\\\\mathrm\\{-\\}|\\\\mathrm\\{\\\\times\\}|\\\\mathrm\\{\\\\div\\}|\\(|\\$]"+regCursor)
+    var reg=RegExp("(\\\\mathrm\\{\\+}|\\\\mathrm\\{-\\}|\\\\mathrm\\{\\\\times\\}|\\\\mathrm\\{\\\\div\\}|\\(|\\$)"+regCursor);
+    console.log(formula.match(reg));
     if(formula.match(reg)){
         return "";
     }
     //如果第一个参数为数字
-    reg=RegExp("([\\d|\\.]+)"+regCursor)
+    reg=RegExp("((\\d|\\.)+)"+regCursor)
     if(formula.match(reg)){
         return RegExp.$1;
     }
     //如果第一个参数为常数
-    reg=RegExp("([\\\\pi|(\\\\mathrm\\{e\\})])"+regCursor);
+    reg=RegExp("((\\\\pi)|(\\\\mathrm\\{e\\}))"+regCursor);
     if(formula.match(reg)){
-        alert(RegExp.$1);
         return RegExp.$1;
     }
     //如果匹配的为括号
@@ -132,10 +140,13 @@ function searchFirstPara(formula){
         reg=RegExp("\\["+bracketsNumber+"\\](.+?\\["+bracketsNumber+"\\]\\))"+regCursor);
         handleBracketsStr.match(reg);
         var firstParaWithSignal=RegExp.$1;
-        var firstPara=firstParaWithSignal.replace(/\\[.+?\\]/g,"");
+        var firstPara=firstParaWithSignal.replace(/\[.+?\]/g,"");
         console.log(firstPara);
         //判断是否为函数
-        reg=RegExp("([])")
+        reg=RegExp("(\\\\sin|\\\\cos|\\\\tan|\\\\ln|\\\\arcsin|\\\\arccos|\\\\arctan)"+firstPara);
+        if(formula.match(reg)){
+            return RegExp.$1+firstPara;
+        }
     }
 }
 function shiftButton(){
