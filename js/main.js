@@ -143,21 +143,54 @@ function searchFirstPara(formula){
         var firstPara=firstParaWithSignal.replace(/\[.+?\]/g,"");
         console.log(firstPara);
         //判断是否为函数
-        reg=RegExp("(\\\\sin|\\\\cos|\\\\tan|\\\\ln|\\\\arcsin|\\\\arccos|\\\\arctan)"+firstPara);
+        reg=RegExp("(\\\\sin|\\\\cos|\\\\tan|\\\\ln|\\\\arcsin|\\\\arccos|\\\\arctan)"+strToReg(firstPara));
+        console.log(reg);
         if(formula.match(reg)){
             return RegExp.$1+firstPara;
         }
+        else{
+            return firstPara;
+        }
     }
 }
-function shiftButton(){
-    if(page==1){
-        page=2;
-        myApp.showTab("#tab2");
+/*
+    strToReg(formula):不转义
+    将字符串转为不转义的正则表达式
+*/
+function strToReg(str){
+    var metaChar=["\\\\","\\^","\\$","\\.","\\*","\\+","\\?","\\|","\\/","\\(","\\)","\\[","\\]","\\{","\\}","\\=","\\!","\\:","\\-"];
+    for(i=0;i<metaChar.length;i++){
+        reg=RegExp("("+metaChar[i]+")","g");
+        str=str.replace(reg,"\\"+"$1");
     }
-    else if(page==2){
-        page=1;
-        myApp.showTab("#tab1");
+    console.log(str);
+    return str;
+}
+/*
+    changePage(arg):切换页面。当按下shift或换页是触发
+    参数：arg，shift或LR
+*/
+function changePage(arg){
+    //若为shift，奇数+1，偶数-1
+    //若为LR，若为4的倍数+3或+4，-2；若为4的倍数+1或+2，+2
+    if(arg.method=="shift"){
+        if(page%2==1){
+            page+=1;
+        }
+        else if(page%2==0){
+            page-=1;
+        }
     }
+    else if(arg.method=="LR"){
+        if(page%4==1||page%4==2){
+            page+=2;
+        }
+        else if(page%4==3||page%4==0){
+            page-=2;
+        }
+    }
+    console.log("chagePage"+page);
+    myApp.showTab("#tab"+String(page));
 }
 /*
     upButtonClick()
@@ -210,41 +243,57 @@ function clearContent(){
     返回：无
 */
 function del(del=1){
-    currentFormula=strPreHandle(currentFormula);
-    //获取当前光标位置$xxxcursor
-    var cursorLocation=currentFormula.indexOf(cursor);
-    if(cursorLocation>0){
-        currentFormula=currentFormula.replace(cursor,"");
-        //寻找合适的光标位置
-        //排除A-Z、a-z、/、[a-z]( 、[A-Z](
-            while(del){
-                if(cursorLocation<2){
-                    break;
-                }
-                testChar=currentFormula.charAt(cursorLocation-1);
-                if(cursorLocation>2){
-                    testChar2=currentFormula.charAt(cursorLocation-2);
-                }
-                currentFormula=currentFormula.substr(0,cursorLocation-1)+currentFormula.substr(cursorLocation,currentFormula.length);
-                console.log("test:"+currentFormula);
-                if(testChar.match(/\(/)){   
-                    if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z]/)){
-                        cursorLocation-=1;
-                    }
-                }
-                else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/\\/)){
-                    cursorLocation-=1;
-                }
-                else{
-                    cursorLocation-=1;
-                    del-=1;
-                }
+    // currentFormula=strPreHandle(currentFormula);
+    // //获取当前光标位置$xxxcursor
+    // var cursorLocation=currentFormula.indexOf(cursor);
+    // if(cursorLocation>0){
+    //     currentFormula=currentFormula.replace(cursor,"");
+    //     //寻找合适的光标位置
+    //     //排除A-Z、a-z、/、[a-z]( 、[A-Z](
+    //         while(del){
+    //             if(cursorLocation<2){
+    //                 break;
+    //             }
+    //             testChar=currentFormula.charAt(cursorLocation-1);
+    //             if(cursorLocation>2){
+    //                 testChar2=currentFormula.charAt(cursorLocation-2);
+    //             }
+    //             currentFormula=currentFormula.substr(0,cursorLocation-1)+currentFormula.substr(cursorLocation,currentFormula.length);
+    //             console.log("test:"+currentFormula);
+    //             if(testChar.match(/\(/)){   
+    //                 if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z]/)){
+    //                     cursorLocation-=1;
+    //                 }
+    //             }
+    //             else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/\\/)){
+    //                 cursorLocation-=1;
+    //             }
+    //             else{
+    //                 cursorLocation-=1;
+    //                 del-=1;
+    //             }
+    //         }
+    //         currentFormula=insertStr(currentFormula,cursorLocation,cursor);
+    //         //去除空格，strPreHandle副产物
+    //         currentFormula=currentFormula.replace(/ /g,"");
+    //         reload();
+        // }
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
+    while(del>0){
+        for(i=0;i<wholeSingnal.length;i++){
+            var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
+            if(currentFormula.match(reg)){
+                currentFormula=currentFormula.replace(reg,"$2");
+                del-=1;
+                break;
             }
-            currentFormula=insertStr(currentFormula,cursorLocation,cursor);
-            //去除空格，strPreHandle副产物
-            currentFormula=currentFormula.replace(/ /g,"");
-            reload();
         }
+        del-=1;
+    }
+console.log("moveLefted:"+currentFormula);
+Already=false;
+reload();
 }
 /*
     clearHistory()
@@ -261,7 +310,7 @@ function clearHistory(){
 */
 function moveLeft(lm){
     var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
-                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)"]
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(lm>0){
         for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
@@ -285,54 +334,70 @@ function absMoveLeft(lm){
 
 }
 function moveRight(rm){
-    //currentFormula=strPreHandle(currentFormula);
-    //获取当前光标位置$xxxcursor
-    var cursorLocation=currentFormula.indexOf(cursor);
-    if(cursorLocation+cursor.length+1<currentFormula.length){
-        currentFormula=currentFormula.replace(cursor,"");
-        while(rm){
-            if(cursorLocation+1<currentFormula.length){
-                testChar=currentFormula.charAt(cursorLocation);
-                testChar2=currentFormula.charAt(cursorLocation-1);
-                if(testChar.match(/[\(]/)){   
-                    if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z|]/)){
-                        cursorLocation+=1;
-                        rm-=1;
-                    }
-                }
-                else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/[\\|}]/)){
-                    cursorLocation+=1;
-                    console.log(testChar+cursorLocation);
-                }
-                else{
-                    cursorLocation+=1;
-                    rm-=1;
-                }
-            }
-            else{
+    // //currentFormula=strPreHandle(currentFormula);
+    // //获取当前光标位置$xxxcursor
+    // var cursorLocation=currentFormula.indexOf(cursor);
+    // if(cursorLocation+cursor.length+1<currentFormula.length){
+    //     currentFormula=currentFormula.replace(cursor,"");
+    //     while(rm){
+    //         if(cursorLocation+1<currentFormula.length){
+    //             testChar=currentFormula.charAt(cursorLocation);
+    //             testChar2=currentFormula.charAt(cursorLocation-1);
+    //             if(testChar.match(/[\(]/)){   
+    //                 if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z|]/)){
+    //                     cursorLocation+=1;
+    //                     rm-=1;
+    //                 }
+    //             }
+    //             else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/[\\|}]/)){
+    //                 cursorLocation+=1;
+    //                 console.log(testChar+cursorLocation);
+    //             }
+    //             else{
+    //                 cursorLocation+=1;
+    //                 rm-=1;
+    //             }
+    //         }
+    //         else{
+    //             break;
+    //         }
+    //     }
+    //     console.log(currentFormula);
+    //     currentFormula=insertStr(currentFormula,cursorLocation,cursor);
+    //     //假如进入下划线
+    //     reg=new RegExp(regCursor+"\\\\underline\\{");
+    //     currentFormula=currentFormula.replace(reg,"\\underline{"+cursor);
+    //     //加入进入排列组合上部分
+    //     reg=new RegExp("([C|P])_\\{(.+?)\\}\\^"+regCursor+"\\{");
+    //     currentFormula=currentFormula.replace(reg,"$1\_\{$2\}\^\{"+cursor);
+    //     console.log(currentFormula);
+    //     //去除下划线
+    //     // if(cursorOnTheLine){
+    //     //     var reg=new RegExp("\\\\underline\\{(.+)\\}(?="+cursor+")");
+    //     //     console.log(reg);
+    //     //     currentFormula=currentFormula.replace(reg,"$1");
+    //     //     cursorOnTheLine=false;
+    //     // }
+    //     currentFormula=deleteUnderline(currentFormula);
+    //     Already=false;
+    //     reload();
+    // }
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
+    while(rm>0){
+        for(i=0;i<wholeSingnal.length;i++){
+            var reg=new RegExp("("+regCursor+")("+wholeSingnal[i]+")");
+            if(currentFormula.match(reg)){
+                currentFormula=currentFormula.replace(reg,"$2$1");
+                rm-=1;
                 break;
             }
         }
-        console.log(currentFormula);
-        currentFormula=insertStr(currentFormula,cursorLocation,cursor);
-        //假如进入下划线
-        reg=new RegExp(regCursor+"\\\\underline\\{");
-        currentFormula=currentFormula.replace(reg,"\\underline{"+cursor);
-        //加入进入排列组合上部分
-        reg=new RegExp("([C|P])_\\{(.+?)\\}\\^"+regCursor+"\\{");
-        currentFormula=currentFormula.replace(reg,"$1\_\{$2\}\^\{"+cursor);
-        console.log(currentFormula);
-        //去除下划线
-        // if(cursorOnTheLine){
-        //     var reg=new RegExp("\\\\underline\\{(.+)\\}(?="+cursor+")");
-        //     console.log(reg);
-        //     currentFormula=currentFormula.replace(reg,"$1");
-        //     cursorOnTheLine=false;
-        // }
-        currentFormula=deleteUnderline(currentFormula);
-        Already=false;
-        reload();
-    }
+        rm-=1;
+        }
+    console.log("moveRighted:"+currentFormula);
+    Already=false;
+    reload();
 }
 /*
     deleteUnderline()
