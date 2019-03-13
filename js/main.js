@@ -16,6 +16,7 @@ var recordNumber=0;//记录条数
 var logFormula="";//记录的公式
 var logResult="";//记录的结果
 var currentLog=localStorage.length;//当前记录
+var degMode="rad"
 init();
 /*
     init初始化
@@ -278,7 +279,7 @@ function del(del=1){
     //         currentFormula=currentFormula.replace(/ /g,"");
     //         reload();
         // }
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}","[0-9]","\\.","\\\\pi",
         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(del>0){
         for(i=0;i<wholeSingnal.length;i++){
@@ -303,8 +304,21 @@ function clearHistory(){
     localStorage.clear();
     alert("历史记录已清空");
 }
+/* changeMode:改变模式
+    参数：mode.key
+    return:none
+*/
+function changeDegMode(){
+    if(degMode=="rad"){
+        degMode="deg";
+    }
+    else if(degMode=="deg"){
+        degMode="rad";
+    }
+    $$("#deg").text(degMode);
+}
 /*
-    光标左移
+    moveLeft:光标左移
     参数：左移位数
     返回：无
 */
@@ -382,7 +396,7 @@ function moveRight(rm){
     //     Already=false;
     //     reload();
     // }
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(rm>0){
         for(i=0;i<wholeSingnal.length;i++){
@@ -540,18 +554,28 @@ function handleString(str){
     str=str.replace(/\\times/g,"*");
     str=str.replace(/\\div/,"/");
     //三角函数处理
-    str=str.replace(/(\\sin\()(.+?)\)/g,"math.sin($2)");
-    str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
-    str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
-    str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
-    str=str.replace(/(\\arccos\()(.+?)\)/g,"math.acos($2)");
-    str=str.replace(/(\\arctan\()(.+?)\)/g,"math.atan($2)");
+    if(degMode=="rad"){
+        str=str.replace(/(\\sin\()(.+?)\)/g,"math.sin($2)");
+        str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
+        str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
+        str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
+        str=str.replace(/(\\arccos\()(.+?)\)/g,"math.acos($2)");
+        str=str.replace(/(\\arctan\()(.+?)\)/g,"math.atan($2)");
+    }
+    else if(degMode=="deg"){
+        str=str.replace(/(\\sin\()(.+?)\)/g,"dsin($2)");
+        str=str.replace(/(\\cos\()(.+?)\)/g,"dcos($2)");
+        str=str.replace(/(\\tan\()(.+?)\)/g,"dtan($2)");
+        str=str.replace(/(\\arcsin\()(.+?)\)/g,"dasin($2)");
+        str=str.replace(/(\\arccos\()(.+?)\)/g,"dacos($2)");
+        str=str.replace(/(\\arctan\()(.+?)\)/g,"datan($2)");
+    }
     str=str.replace(/(\\log\()(.+?)\)/g,"lg($2)");//替换以十为底的对数
     //third row
     str=str.replace(/(\\ln\()(.+?)(\))/g,"math.log($2,math.e)");
     //fourth row
     str=str.replace(/\(?([\d|\.]+)\)?\^\{?\(?(\-?[\d|\.]+)\)?\}?/g,"math.pow($1,$2)");
-    str=str.replace(/\\sqrt\[(.+?)\]\{(.+?)\}/g,"root($2,$1)");
+    str=str.replace(/\\sqrt\[(.+?)\]\{(.+?)\}/g,"math.nthRoot($2,$1)");
     //fifth row
     str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"math.divide($1,$2)");
     console.log("handledString:"+str);

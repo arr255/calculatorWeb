@@ -17,9 +17,24 @@ function NPr(x){
     return "error";
     }
 }
-function root(a,root){
-    if(root==0){
-        alert("错误算式");
-    }
-    return math.pow(a,1/root);
+function degToRad(deg){
+    return math.PI*deg/180
+}
+function dsin(x){
+    return math.sin(degToRad(x));
+}
+function dcos(x){
+    return math.cos(degToRad(x));
+}
+function dtan(x){
+    return math.tan(degToRad(x));
+}
+function dasin(x){
+    return math.asin(degToRad(x));
+}
+function dacos(x){
+    return math.acos(degToRad(x));
+}
+function datan(x){
+    return math.atan(degToRad(x))
 }

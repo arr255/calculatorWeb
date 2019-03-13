@@ -32,7 +32,7 @@
             <div class="mainShow" id="mainShow">
                 <div class="status" id="status">
                     <span id="cal">cal</span>
-                    <span id="rad">rad</span>
+                    <span id="deg">rad</span>
                 </div>
                 <div id="formula">
                     ${\color{yellow}|}$
@@ -519,7 +519,7 @@
                                     </a>
                                 </div>
                                 <div class="col-25">
-                                    <a class="button">
+                                    <a class="button" onclick="changePage({method:'LR'})">
                                         <i class="f7-icons">fastforward</i>
                                     </a>
                                 </div>
@@ -535,7 +535,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill">
+                                    <a class="button button-fill" onclick="changeDegMode()">
                                         <span>RAD</span>
                                     </a>
                                 </div>
