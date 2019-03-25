@@ -38,3 +38,51 @@ function dacos(x){
 function datan(x){
     return math.atan(degToRad(x))
 }
+
+function integral(expr,downNumber,upNumber,variable){
+    var intNumber=1000;//积分次数
+    var eachInterval=(upNumber-downNumber)/intNumber;//间隔
+    result=0;//结果
+    for(k=0;k<intNumber;k++){
+        varNumber=downNumber+eachInterval*k;//变量值
+        formula=expr.replace(variable,String(varNumber));
+        result+=parseFloat(mainCalculateAPI(formula)*eachInterval);
+    }
+    result=math.round(result,4);
+    console.log(result);
+    return result;
+}
+function intFromServer(downNumber,upNumber,expr){
+    reg=RegExp(/\{color\{pink\}(.+?)\}/g);
+    if(expr.match(reg)){
+        variable=RegExp.$1;
+        expr=expr.replace(reg,variable);
+    }
+    else{
+        variable="x";
+    }
+    //幂
+    expr=expr.replace(/\^{(.+?)\}/g,"^$1");
+    //根号
+    expr=expr.replace(/sqrt\[(.+?)\]\{(.+?)\}/g,"$2**$1");
+    //分数
+    expr=expr.replace(/rac\{(.+?)\}\{(.+?)\}/g,"$1/$2");
+    //运算符
+    expr=expr.replace(/mathrm\{(.+?)\}/,"$1");
+    console.log(expr);
+    res=""
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/cal",
+        method:"get",
+        data:{"formula":expr,"variable":variable,"downNumber":downNumber,"upNumber":upNumber},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res= data.result2;
+        },
+        error:function(){
+            res= "";
+        }
+    })
+    return res;
+}

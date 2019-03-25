@@ -17,12 +17,14 @@ var logFormula="";//记录的公式
 var logResult="";//记录的结果
 var currentLog=localStorage.length;//当前记录
 var degMode="rad"
+var varColor="pink"
+var variable=['x'];
 init();
 /*
     init初始化
 */
 function init(){
-    console.log(currentFormula);
+    //console.log(currentFormula);
     $$("a.button").css("height",buttonHeight+"px");
     $$("a").children().css("position","relative");
     $$("a").children().css("top",buttonHeight/3+"px");
@@ -60,46 +62,7 @@ function changeFormula(formula,arg={}){
     添加分数
 */
 function addFrac(){
-    // searchFirstPara(currentFormula);
-    // var firstParaStr="";//获取的第一个参数
-    // var bracketsNumber=0;//括号层数
-    // var cursorLocation=currentFormula.indexOf(cursor);//光标位置
-    // for(var i=cursorLocation-1;i>0;i--){
-    //     var reg=/[\+|\-|\*|\/|\(|\$|\}|\,]/;//如果匹配到加减乘除及小括号
-    //     var currentChar=String(currentFormula[i]);
-    //     console.log(currentFormula);
-    //     if(currentChar.match(reg)){//如果匹配到结束符
-    //         if(bracketsNumber==0){//如果不在括号内
-    //             break;
-    //         }
-    //         else{//如果在括号内
-    //             firstParaStr=currentFormula[i]+firstParaStr;
-    //             bracketsNumber-=1;
-    //         }
-    //     }
-    //     else if((currentChar.match(/[\)]/))){//进入括号
-    //         firstParaStr=currentFormula[i]+firstParaStr;
-    //         bracketsNumber+=1;
-    //     }
-    //     else{
-    //         firstParaStr=currentFormula[i]+firstParaStr;
-    //     }
-    // }
-    // currentFormula=currentFormula.substr(0,i+1)+currentFormula.substr(cursorLocation);
-    // cursorLocation=currentFormula.indexOf(cursor);
-    // // alert(currentFormula);
-    // if(firstParaStr==""){//如果未找到参数
-    //     currentFormula=currentFormula.replace(cursor,"");//删除光标
-    //     currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{\\underline{"+cursor+"}}{\\underline{}}");
-    //     cursorOnTheLine=true;
-    // }
-    // else{
-    //     currentFormula=currentFormula.replace(cursor,"");
-    //     currentFormula=insertStr(currentFormula,cursorLocation,"\\frac{"+firstParaStr+"}{\\underline{"+cursor+"}}");
-    //     cursorOnTheLine=true;
-    // }
-    // console.log("firstParaStr:"+firstParaStr);
-    var firstPara=searchFirstPara(currentFormula);
+    var firstPara=searchFirstPara(currentFormula,regCursor);
     if(!firstPara){
         changeFormula("\\frac{\\underline{}}{}",{leftMove:4});
     }
@@ -110,42 +73,40 @@ function addFrac(){
     reload();
 }
 /*
-    searchFirstPara(formula)
-    寻找参数，用于分数
+    searchFirstPara(formula,endSignal)
+    寻找参数，用于分数，阶乘
     返回值：第一个参数字符串
 */
-function searchFirstPara(formula){
+function searchFirstPara(formula,endSignal){
     //如果第一个参数为空为空,包括加减乘除、左括号，$，
-    var reg=RegExp("(\\\\mathrm\\{\\+}|\\\\mathrm\\{-\\}|\\\\mathrm\\{\\\\times\\}|\\\\mathrm\\{\\\\div\\}|\\(|\\$)"+regCursor);
-    console.log(formula.match(reg));
+    var reg=RegExp("(\\\\mathrm\\{\\+}|\\\\mathrm\\{-\\}|\\\\mathrm\\{\\\\times\\}|\\\\mathrm\\{\\\\div\\}|\\(|\\$)"+endSignal);
     if(formula.match(reg)){
         return "";
     }
     //如果第一个参数为数字
-    reg=RegExp("((\\d|\\.)+)"+regCursor)
+    reg=RegExp("((\\d|\\.)+)"+endSignal)
     if(formula.match(reg)){
         return RegExp.$1;
     }
     //如果第一个参数为常数
-    reg=RegExp("((\\\\pi)|(\\\\mathrm\\{e\\}))"+regCursor);
+    reg=RegExp("((\\\\pi)|(\\\\mathrm\\{e\\}))"+endSignal);
     if(formula.match(reg)){
         return RegExp.$1;
     }
     //如果匹配的为括号
-    reg=RegExp("\\)"+regCursor);
+    reg=RegExp("\\)"+endSignal);
     if(formula.match(reg)){
         var handleBracketsStr=handleBrackets(formula);
-        reg=RegExp("\\[(\\d+?)\\]\\)"+regCursor);
+        reg=RegExp("\\[(\\d+?)\\]\\)"+endSignal);
         handleBracketsStr.match(reg);
         var bracketsNumber=RegExp.$1;
-        reg=RegExp("\\["+bracketsNumber+"\\](.+?\\["+bracketsNumber+"\\]\\))"+regCursor);
+        reg=RegExp("\\["+bracketsNumber+"\\](.+?\\["+bracketsNumber+"\\]\\))"+endSignal);
         handleBracketsStr.match(reg);
         var firstParaWithSignal=RegExp.$1;
         var firstPara=firstParaWithSignal.replace(/\[.+?\]/g,"");
-        console.log(firstPara);
+        //console.log("firstPara:"+firstPara);
         //判断是否为函数
         reg=RegExp("(\\\\sin|\\\\cos|\\\\tan|\\\\ln|\\\\arcsin|\\\\arccos|\\\\arctan)"+strToReg(firstPara));
-        console.log(reg);
         if(formula.match(reg)){
             return RegExp.$1+firstPara;
         }
@@ -164,7 +125,6 @@ function strToReg(str){
         reg=RegExp("("+metaChar[i]+")","g");
         str=str.replace(reg,"\\"+"$1");
     }
-    console.log(str);
     return str;
 }
 /*
@@ -190,7 +150,7 @@ function changePage(arg){
             page-=2;
         }
     }
-    console.log("chagePage"+page);
+    //console.log("chagePage:"+page);
     myApp.showTab("#tab"+String(page));
 }
 /*
@@ -244,41 +204,6 @@ function clearContent(){
     返回：无
 */
 function del(del=1){
-    // currentFormula=strPreHandle(currentFormula);
-    // //获取当前光标位置$xxxcursor
-    // var cursorLocation=currentFormula.indexOf(cursor);
-    // if(cursorLocation>0){
-    //     currentFormula=currentFormula.replace(cursor,"");
-    //     //寻找合适的光标位置
-    //     //排除A-Z、a-z、/、[a-z]( 、[A-Z](
-    //         while(del){
-    //             if(cursorLocation<2){
-    //                 break;
-    //             }
-    //             testChar=currentFormula.charAt(cursorLocation-1);
-    //             if(cursorLocation>2){
-    //                 testChar2=currentFormula.charAt(cursorLocation-2);
-    //             }
-    //             currentFormula=currentFormula.substr(0,cursorLocation-1)+currentFormula.substr(cursorLocation,currentFormula.length);
-    //             console.log("test:"+currentFormula);
-    //             if(testChar.match(/\(/)){   
-    //                 if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z]/)){
-    //                     cursorLocation-=1;
-    //                 }
-    //             }
-    //             else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/\\/)){
-    //                 cursorLocation-=1;
-    //             }
-    //             else{
-    //                 cursorLocation-=1;
-    //                 del-=1;
-    //             }
-    //         }
-    //         currentFormula=insertStr(currentFormula,cursorLocation,cursor);
-    //         //去除空格，strPreHandle副产物
-    //         currentFormula=currentFormula.replace(/ /g,"");
-    //         reload();
-        // }
     var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}","[0-9]","\\.","\\\\pi",
         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(del>0){
@@ -292,7 +217,7 @@ function del(del=1){
         }
         del-=1;
     }
-console.log("moveLefted:"+currentFormula);
+//console.log("moveLefted:"+currentFormula);
 Already=false;
 reload();
 }
@@ -336,7 +261,7 @@ function moveLeft(lm){
         }
         lm-=1;
     }
-    console.log("moveLefted:"+currentFormula);
+    //console.log("moveLefted:"+currentFormula);
     Already=false;
     reload();
     }
@@ -348,55 +273,7 @@ function absMoveLeft(lm){
 
 }
 function moveRight(rm){
-    // //currentFormula=strPreHandle(currentFormula);
-    // //获取当前光标位置$xxxcursor
-    // var cursorLocation=currentFormula.indexOf(cursor);
-    // if(cursorLocation+cursor.length+1<currentFormula.length){
-    //     currentFormula=currentFormula.replace(cursor,"");
-    //     while(rm){
-    //         if(cursorLocation+1<currentFormula.length){
-    //             testChar=currentFormula.charAt(cursorLocation);
-    //             testChar2=currentFormula.charAt(cursorLocation-1);
-    //             if(testChar.match(/[\(]/)){   
-    //                 if(testChar2.match(/[a-z]/) || testChar2.match(/[A-Z|]/)){
-    //                     cursorLocation+=1;
-    //                     rm-=1;
-    //                 }
-    //             }
-    //             else if(testChar.match(/[a-z]/) || testChar.match(/[A-Z]/) || testChar.match(/[\\|}]/)){
-    //                 cursorLocation+=1;
-    //                 console.log(testChar+cursorLocation);
-    //             }
-    //             else{
-    //                 cursorLocation+=1;
-    //                 rm-=1;
-    //             }
-    //         }
-    //         else{
-    //             break;
-    //         }
-    //     }
-    //     console.log(currentFormula);
-    //     currentFormula=insertStr(currentFormula,cursorLocation,cursor);
-    //     //假如进入下划线
-    //     reg=new RegExp(regCursor+"\\\\underline\\{");
-    //     currentFormula=currentFormula.replace(reg,"\\underline{"+cursor);
-    //     //加入进入排列组合上部分
-    //     reg=new RegExp("([C|P])_\\{(.+?)\\}\\^"+regCursor+"\\{");
-    //     currentFormula=currentFormula.replace(reg,"$1\_\{$2\}\^\{"+cursor);
-    //     console.log(currentFormula);
-    //     //去除下划线
-    //     // if(cursorOnTheLine){
-    //     //     var reg=new RegExp("\\\\underline\\{(.+)\\}(?="+cursor+")");
-    //     //     console.log(reg);
-    //     //     currentFormula=currentFormula.replace(reg,"$1");
-    //     //     cursorOnTheLine=false;
-    //     // }
-    //     currentFormula=deleteUnderline(currentFormula);
-    //     Already=false;
-    //     reload();
-    // }
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","\\}\\^\\{","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(rm>0){
         for(i=0;i<wholeSingnal.length;i++){
@@ -409,7 +286,7 @@ function moveRight(rm){
         }
         rm-=1;
         }
-    console.log("moveRighted:"+currentFormula);
+    //console.log("moveRighted:"+currentFormula);
     Already=false;
     reload();
 }
@@ -444,9 +321,13 @@ function strPreHandle(formula){
  ******************************/
 //主计算函数
 function calculate(string){
+    console.log("Calculator Received String:"+string);
     string=handleString(string);
-    //string=string.replace(/\(|\)/g,"");//去除括号；
-    console.log("Foreeval:"+string);
+    string=handleFactorial(string);
+    console.log("Calculaor HandledString:"+string);
+    if(string.match(/^\d+\,\d+$/)){
+        return string;
+    }
     var result=eval(string);
     ApproResult=math.round(parseFloat(result),7);
     if(ApproResult){
@@ -469,7 +350,20 @@ function mainCalculate(formula){
     localStorage.setItem(logFormula,"");
     //第一次处理，将常数转换
     string=handleConst(formula);
-    //第二次处理，添加标号
+    //第二次处理，函数处理
+    //删除光标
+    formula=formula.replace(cursor,"");
+    //处理积分
+    if(formula.match(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/g)){
+        downNumber=RegExp.$1;
+        upNumber=RegExp.$2;
+        expr=RegExp.$3;
+        console.log(formula);
+        formula=formula.replace(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/g,eval("intFromServer("+downNumber+","+upNumber+",'"+expr+"')"));
+        console.log(formula);
+    }
+    console.log(formula);
+    //第三次处理，添加标号
     string=handleBrackets(formula);
     formula=handleBrackets(formula);
     maxBrackets=1;
@@ -482,8 +376,9 @@ function mainCalculate(formula){
         var handledResult=String(calculate(RegExp.$2));//括号内计算结果
         formula.match(reg);  //重新赋值
         formula=formula.replace(reg,RegExp.$1+handledResult+RegExp.$3).replace(signalReg,"");
-        console.log("result:"+formula);
+        //console.log("result:"+formula);
     }
+    formula=handleFactorial(formula);
     var finalResult=calculate(formula);
     //alert(finalResult);
     $$("#result").text(finalResult);
@@ -493,13 +388,42 @@ function mainCalculate(formula){
     currentLog=localStorage.length;
 }
 /*
+    mainCalculatorAPI(formula):用于积分
+    return result;
+*/
+function mainCalculateAPI(formula){
+    //console.log("recievedString:"+formula);
+    logFormula=formula.replace(cursor,"");
+    localStorage.setItem(logFormula,"");
+    //第一次处理，将常数转换
+    string=handleConst(formula);
+    //第二次处理，添加标号
+    string=handleBrackets(formula);
+    formula=handleBrackets(formula);
+    //处理阶乘
+    maxBrackets=1;
+    for(var i=maxBrackets;i>=0;i--){
+        //字符串需要加上双重转义字符
+        var signal="\\["+String(i)+"\\]";
+        var reg=new RegExp("("+signal+"\\("+")"+"(.+?)"+"("+signal+"\\))",'g');
+        var signalReg=new RegExp(signal,"g");
+        formula.match(reg);
+        var handledResult=String(calculate(RegExp.$2));//括号内计算结果
+        formula.match(reg);  //重新赋值
+        formula=formula.replace(reg,RegExp.$1+handledResult+RegExp.$3).replace(signalReg,"");
+        //console.log("result:"+formula);
+    }
+    formula=handleFactorial(formula);
+    var finalResult=calculate(formula);
+    return finalResult
+}
+/*
     handleConst(formula):常数处理,将pi、e变为数字，便于后续处理
     参数：待处理式子
     返回值：处理后式子
 */
 function handleConst(formula){
     formula=formula.replace("\\pi",Math.PI).replace("\\mathrm{e}",Math.E);
-    console.log("handledConst",formula);
     return formula;
 }
 /*
@@ -527,7 +451,7 @@ function handleBrackets(formula){
             controlNumber-=1;
         }
     }
-    console.log("handledBrackets:"+result);
+    //console.log("handledBrackets:"+result);
     return result;
 }
 /*
@@ -570,6 +494,12 @@ function handleString(str){
         str=str.replace(/(\\arccos\()(.+?)\)/g,"dacos($2)");
         str=str.replace(/(\\arctan\()(.+?)\)/g,"datan($2)");
     }
+    str=str.replace(/(\\sinh\^\{-1\}\()(.+?)\)/g,"math.asinh($2)");
+    str=str.replace(/(\\cosh\^\{-1\}\()(.+?)\)/g,"math.acosh($2)");
+    str=str.replace(/(\\tanh\^\{-1\}\()(.+?)\)/g,"math.atanh($2)");
+    str=str.replace(/(\\sinh\()(.+?)\)/g,"math.sinh($2)");
+    str=str.replace(/(\\cosh\()(.+?)\)/g,"math.cosh($2)");
+    str=str.replace(/(\\tanh\()(.+?)\)/g,"math.tanh($2)");
     str=str.replace(/(\\log\()(.+?)\)/g,"lg($2)");//替换以十为底的对数
     //third row
     str=str.replace(/(\\ln\()(.+?)(\))/g,"math.log($2,math.e)");
@@ -578,8 +508,32 @@ function handleString(str){
     str=str.replace(/\\sqrt\[(.+?)\]\{(.+?)\}/g,"math.nthRoot($2,$1)");
     //fifth row
     str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"math.divide($1,$2)");
-    console.log("handledString:"+str);
+    str=str.replace(/GCD/g,"math.gcd")
+    str=str.replace(/LCM/g,"math.lcm")
     return str;
+}
+/*
+处理阶乘
+    handleFactorial(formula)
+    return:Handled Result
+*/
+function handleFactorial(formula){
+    var para=searchFirstPara(formula,"\\!");
+    //带括号
+    reg=RegExp("("+para+")"+"\\!","g");
+    // formula=formula.replace(/\(/g,"").replace(/\)/g,"");
+    if(formula.match(reg)){
+        para=RegExp.$1.replace(/\(/g,"").replace(/\)/g,"");
+        formula=formula.replace(reg,"math.factorial("+para+")"); 
+        return formula;
+    } 
+    //不带括号
+    reg=RegExp("\\(?("+para+")\\)?"+"\\!","g");
+    if(formula.match(reg)){
+        para=RegExp.$1.replace(/\(/g,"").replace(/\)/g,"");
+        formula=formula.replace(reg,"(math.factorial("+para+"))"); 
+    } 
+    return formula;
 }
 /*
     reload()：重新载入
