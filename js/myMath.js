@@ -61,18 +61,10 @@ function intFromServer(downNumber,upNumber,expr){
     else{
         variable="x";
     }
-    //幂
-    expr=expr.replace(/\^{(.+?)\}/g,"^$1");
-    //根号
-    expr=expr.replace(/sqrt\[(.+?)\]\{(.+?)\}/g,"$2**$1");
-    //分数
-    expr=expr.replace(/rac\{(.+?)\}\{(.+?)\}/g,"$1/$2");
-    //运算符
-    expr=expr.replace(/mathrm\{(.+?)\}/,"$1");
-    console.log(expr);
+    expr=handleToPy(expr);
     res=""
     $$.ajax({
-        url:"http://www.guomf.top:8002/calPage/cal",
+        url:"http://localhost:12345/calPage/cal",
         method:"get",
         data:{"formula":expr,"variable":variable,"downNumber":downNumber,"upNumber":upNumber},
         async:false,
@@ -85,4 +77,46 @@ function intFromServer(downNumber,upNumber,expr){
         }
     })
     return res;
+}
+function diffFromServer(expr,number){
+    reg=RegExp(/\{color\{pink\}(.+?)\}/g);
+    if(expr.match(reg)){
+        variable=RegExp.$1;
+        expr=expr.replace(reg,variable);
+    }
+    else{
+        variable="x";
+    }
+    expr=handleToPy(expr);
+    res="";
+    $$.ajax({
+        url:"http://127.0.0.1:12345/calPage/myDiff",
+        method:"get",
+        data:{"expr":expr,"variable":variable,"number":number},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res= data.result;
+        },
+        error:function(){
+            res= "";
+        }
+    })
+    console.log(res);
+    return res;
+}
+function handleToPy(expr){
+    //幂
+    expr=expr.replace(/\^{(.+?)\}/g,"^$1");
+    //根号
+    expr=expr.replace(/sqrt\[(.+?)\]\{(.+?)\}/g,"$2**$1");
+    //分数
+    expr=expr.replace(/rac\{(.+?)\}\{(.+?)\}/g,"$1/$2");
+    //运算符
+    expr=expr.replace(/mathrm\{+\}/g,"+");
+    expr=expr.replace(/mathrm\{div\}/g,"/");
+    expr=expr.replace(/mathrm\{\times\}/g,"*");
+    expr=expr.replace(/mathrm\{-\}/g,"-");
+    console.log(expr);
+    return expr;
 }

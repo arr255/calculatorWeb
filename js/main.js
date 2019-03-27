@@ -362,6 +362,13 @@ function mainCalculate(formula){
         formula=formula.replace(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/g,eval("intFromServer("+downNumber+","+upNumber+",'"+expr+"')"));
         console.log(formula);
     }
+    //处理导数
+    if(formula.match(/\\delta\((.+?)\,(.+?)\)/g)){
+        expr=RegExp.$1;
+        number=RegExp.$2;
+        formula=formula.replace(/\\delta\((.+?)\,(.+?)\)/g,eval("diffFromServer("+expr+","+number+")"));
+        console.log(formula)
+    }
     console.log(formula);
     //第三次处理，添加标号
     string=handleBrackets(formula);
