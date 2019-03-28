@@ -273,7 +273,7 @@ function absMoveLeft(lm){
 
 }
 function moveRight(rm){
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\\\mid","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(rm>0){
         for(i=0;i<wholeSingnal.length;i++){
@@ -324,6 +324,7 @@ function calculate(string){
     console.log("Calculator Received String:"+string);
     string=handleString(string);
     string=handleFactorial(string);
+    string=handleDegree(string);
     console.log("Calculaor HandledString:"+string);
     if(string.match(/^\d+\,\d+$/)){
         return string;
@@ -579,6 +580,12 @@ function handleString(str){
     str=str.replace(/LCM/g,"math.lcm")
     //seventh row
     str=str.replace(/\\log_\{(.+?)\}\((.+?)\)/g,"math.log($2,$1)");
+    //eighth row
+    str=str.replace(/([\d|\.]+)\^\{\\circ\}([\d|\.]+)\^\{\\circ\}([\d|\.]+)\^\{\\circ\}/g,"degreeToNumber({'deg':$1,'min':$2,'sec':$3})");
+    str=str.replace(/([\d|\.]+)\^\{\\circ\}([\d|\.]+)\^\{\\circ\}/g,"degreeToNumber({'deg':$1,'min':$2})");
+    str=str.replace(/([\d|\.]+)\^\{\\circ\}/g,"degreeToNumber({'deg':$1})");
+    str=str.replace(/Npr/g,"Npr");
+    str=str.replace(/\\mid\{(.+?)\}\\mid/,"math.abs($1)")
     return str;
 }
 /*
@@ -601,6 +608,29 @@ function handleFactorial(formula){
     if(formula.match(reg)){
         para=RegExp.$1.replace(/\(/g,"").replace(/\)/g,"");
         formula=formula.replace(reg,"(math.factorial("+para+"))"); 
+    } 
+    return formula;
+}
+/*
+    处理mathrm{d}
+    handleDegree(formula)
+    result:handled result
+*/
+function handleDegree(formula){
+    var para=searchFirstPara(formula,"\\\\mathrm\\{d\\}");
+    //带括号
+    reg=RegExp("("+para+")"+"\\\\mathrm\\{d\\}","g");
+    // formula=formula.replace(/\(/g,"").replace(/\)/g,"");
+    if(formula.match(reg)){
+        para=RegExp.$1.replace(/\(/g,"").replace(/\)/g,"");
+        formula=formula.replace(reg,"degreeToRadium("+para+")"); 
+        return formula;
+    } 
+    //不带括号
+    reg=RegExp("\\(?("+para+")\\)?"+"\\\\mathrm\\{d\\}","g");
+    if(formula.match(reg)){
+        para=RegExp.$1.replace(/\(/g,"").replace(/\)/g,"");
+        formula=formula.replace(reg,"(degreeToRadium("+para+"))"); 
     } 
     return formula;
 }

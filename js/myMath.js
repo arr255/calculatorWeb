@@ -38,7 +38,35 @@ function dacos(x){
 function datan(x){
     return math.atan(degToRad(x))
 }
-
+function degreeToRadium(x){
+    return x/180*math.PI;
+}
+function degreeToNumber(arg){
+    deg=arg.deg;
+    min=arg.min;
+    sec=arg.sec;
+    console.log(deg);
+    if(deg && min && sec){
+        return deg+min/60+sec/3600;
+    }
+    else if(deg && min){
+        return deg+min/60;
+    }
+    else if(deg){
+        return deg;
+    }
+}
+function Npr(x){
+    startX=Math.floor(x)+1;
+    while(1){
+        if(math.isPrime(startX)){
+           return startX; 
+        }
+        else{
+            startX+=1;
+        }
+    }
+}
 function integral(expr,downNumber,upNumber,variable){
     var intNumber=1000;//积分次数
     var eachInterval=(upNumber-downNumber)/intNumber;//间隔
