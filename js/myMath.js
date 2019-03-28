@@ -92,7 +92,7 @@ function intFromServer(downNumber,upNumber,expr){
     expr=handleToPy(expr);
     res=""
     $$.ajax({
-        url:"http://localhost:12345/calPage/myInt",
+        url:"http://www.guomf.top:8002/calPage/myInt",
         method:"get",
         data:{"formula":expr,"variable":variable,"downNumber":downNumber,"upNumber":upNumber},
         async:false,
@@ -121,7 +121,7 @@ function diffFromServer(expr,number){
     console.log(expr)
     res="";
     $$.ajax({
-        url:"http://127.0.0.1:12345/calPage/myDiff",
+        url:"http://www.guomf.top:8002/calPage/myDiff",
         method:"get",
         data:{"expr":expr,"variable":variable,"number":number},
         async:false,
@@ -153,7 +153,7 @@ function sumFromServer(expr,downNumber,upNumber){
     console.log(expr)
     res="";
     $$.ajax({
-        url:"http://127.0.0.1:12345/calPage/mySum",
+        url:"http://www.guomf.top:8002/calPage/mySum",
         method:"get",
         data:{"formula":expr,"downNumber":downNumber,"upNumber":upNumber},
         async:false,
