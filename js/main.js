@@ -273,7 +273,7 @@ function absMoveLeft(lm){
 
 }
 function moveRight(rm){
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
     while(rm>0){
         for(i=0;i<wholeSingnal.length;i++){
@@ -354,20 +354,80 @@ function mainCalculate(formula){
     //删除光标
     formula=formula.replace(cursor,"");
     //处理积分
-    if(formula.match(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/g)){
+    while(formula.match(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/)){
         downNumber=RegExp.$1;
         upNumber=RegExp.$2;
         expr=RegExp.$3;
         console.log(formula);
-        formula=formula.replace(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/g,eval("intFromServer("+downNumber+","+upNumber+",'"+expr+"')"));
+        formula=formula.replace(/\\int_\{(.+?)\}\^\{(.+?)\}(.+?)dx/,eval("intFromServer("+downNumber+","+upNumber+",'"+expr+"')"));
         console.log(formula);
     }
     //处理导数
-    if(formula.match(/\\delta\((.+?)\,(.+?)\)/g)){
+    while(formula.match(/\\delta\((.+?)\,(.+?)\)/)){
         expr=RegExp.$1;
         number=RegExp.$2;
-        formula=formula.replace(/\\delta\((.+?)\,(.+?)\)/g,eval("diffFromServer("+expr+","+number+")"));
+        formula=formula.replace(/\\delta\((.+?)\,(.+?)\)/,eval("diffFromServer('"+expr+"'"+","+"'1')"));
         console.log(formula)
+    }
+    //处理级数和
+    while(formula.match(/\\sum_\{\\color\{pink\}x=(.+?)\}\^\{(.+?)\}\((.+?)\)/)){
+        brackets=0;
+        reg=new RegExp(/\\sum_\{\\color\{pink\}x=(.+?)\}\^\{(.+?)\}\((.+?)\)/)
+        console.log(reg);
+        expr=RegExp.$3;
+        downNumber=RegExp.$1;
+        upNumber=RegExp.$2;
+        while(RegExp.$3.match(/\(/)){
+            brackets+=1;
+            s=".+?";
+            for(i=0;i<brackets;i++){
+                s+="\\).*?";
+            }
+            reg=RegExp("\\\\sum_\\{\\\\color\\{pink\\}x=(.+?)\\}\\^\\{(.+?)\\}\\(("+s+")\\)");
+            formula.match(reg);
+            if(RegExp.$3){
+                expr=RegExp.$3;
+                downNumber=RegExp.$1;
+                upNumber=RegExp.$2;
+            }
+            else{
+                s=s.substr(0,s.length-5);
+                reg=RegExp("\\\\sum_\\{\\\\color\\{pink\\}x=(.+?)\\}\\^\\{(.+?)\\}\\(("+s+")\\)");
+                break;
+            }
+        }
+        console.log(expr);
+        formula=formula.replace(reg,eval("sumFromServer('"+expr+"','"+downNumber+"','"+upNumber+"')"));       
+    }
+    //处理product
+    while(formula.match(/\\prod_\{\\color\{pink\}x=(.+?)\}\^\{(.+?)\}\((.+?)\)/)){
+        brackets=0;
+        reg=new RegExp(/\\prod_\{\\color\{pink\}x=(.+?)\}\^\{(.+?)\}\((.+?)\)/)
+        console.log(reg);
+        expr=RegExp.$3;
+        downNumber=RegExp.$1;
+        upNumber=RegExp.$2;
+        while(RegExp.$3.match(/\(/)){
+            brackets+=1;
+            s=".+?";
+            for(i=0;i<brackets;i++){
+                s+="\\).*?";
+            }
+            reg=RegExp("\\\\prod_\\{\\\\color\\{pink\\}x=(.+?)\\}\\^\\{(.+?)\\}\\(("+s+")\\)");
+            formula.match(reg);
+            if(RegExp.$3){
+                expr=RegExp.$3;
+                downNumber=RegExp.$1;
+                upNumber=RegExp.$2;
+            }
+            else{
+                s=s.substr(0,s.length-5);
+                reg=RegExp("\\\\prod_\\{\\\\color\\{pink\\}x=(.+?)\\}\\^\\{(.+?)\\}\\(("+s+")\\)");
+                break;
+            }
+        }
+        console.log(expr);
+        formula=formula.replace(reg,eval("prodFromServer('"+expr+"','"+downNumber+"','"+upNumber+"')"));       
     }
     console.log(formula);
     //第三次处理，添加标号
@@ -517,6 +577,8 @@ function handleString(str){
     str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"math.divide($1,$2)");
     str=str.replace(/GCD/g,"math.gcd")
     str=str.replace(/LCM/g,"math.lcm")
+    //seventh row
+    str=str.replace(/\\log_\{(.+?)\}\((.+?)\)/g,"math.log($2,$1)");
     return str;
 }
 /*

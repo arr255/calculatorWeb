@@ -64,7 +64,7 @@ function intFromServer(downNumber,upNumber,expr){
     expr=handleToPy(expr);
     res=""
     $$.ajax({
-        url:"http://localhost:12345/calPage/cal",
+        url:"http://localhost:12345/calPage/myInt",
         method:"get",
         data:{"formula":expr,"variable":variable,"downNumber":downNumber,"upNumber":upNumber},
         async:false,
@@ -79,6 +79,8 @@ function intFromServer(downNumber,upNumber,expr){
     return res;
 }
 function diffFromServer(expr,number){
+    expr=String(expr);
+    number=parseFloat(number);
     reg=RegExp(/\{color\{pink\}(.+?)\}/g);
     if(expr.match(reg)){
         variable=RegExp.$1;
@@ -88,11 +90,76 @@ function diffFromServer(expr,number){
         variable="x";
     }
     expr=handleToPy(expr);
+    console.log(expr)
     res="";
     $$.ajax({
         url:"http://127.0.0.1:12345/calPage/myDiff",
         method:"get",
         data:{"expr":expr,"variable":variable,"number":number},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res= data.result;
+        },
+        error:function(){
+            res= "";
+        }
+    })
+    console.log(res);
+    return res;
+}
+function sumFromServer(expr,downNumber,upNumber){
+    console.log(expr);
+    expr=String(expr);
+    downNumber=parseFloat(downNumber);
+    upNumber=parseFloat(upNumber);
+    reg=RegExp(/\{color\{pink\}(.+?)\}/g);
+    if(expr.match(reg)){
+        variable=RegExp.$1;
+        expr=expr.replace(reg,variable);
+    }
+    else{
+        variable="x";
+    }
+    expr=handleToPy(expr);
+    console.log(expr)
+    res="";
+    $$.ajax({
+        url:"http://127.0.0.1:12345/calPage/mySum",
+        method:"get",
+        data:{"formula":expr,"downNumber":downNumber,"upNumber":upNumber},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res= data.result;
+        },
+        error:function(){
+            res= "";
+        }
+    })
+    console.log(res);
+    return res;
+}
+function prodFromServer(expr,downNumber,upNumber){
+    console.log(expr);
+    expr=String(expr);
+    downNumber=parseFloat(downNumber);
+    upNumber=parseFloat(upNumber);
+    reg=RegExp(/\{color\{pink\}(.+?)\}/g);
+    if(expr.match(reg)){
+        variable=RegExp.$1;
+        expr=expr.replace(reg,variable);
+    }
+    else{
+        variable="x";
+    }
+    expr=handleToPy(expr);
+    console.log(expr)
+    res="";
+    $$.ajax({
+        url:"http://127.0.0.1:12345/calPage/myProd",
+        method:"get",
+        data:{"formula":expr,"downNumber":downNumber,"upNumber":upNumber},
         async:false,
         dataType:"json",
         success:function(data){
