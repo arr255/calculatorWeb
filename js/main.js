@@ -152,6 +152,16 @@ function changePage(arg){
             page-=2;
         }
     }
+    else if(arg.method=='R'){
+        if(page%4==3||page%4==0){
+            page-=2;
+        }
+    }
+    else if(arg.method=='L') {
+        if (page%4==1||page%4==2){
+            page+=2;
+        }
+    }
     //console.log("chagePage:"+page);
     myApp.showTab("#tab"+String(page));
 }

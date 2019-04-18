@@ -13,6 +13,7 @@
     <link rel="icon" href='src/favicon.png' type="image/x-icon">
     <link rel='short-cut icon' href='src/favicon.png' type="image/x-icon">  
     <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="js/hammer.min.js"></script>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
@@ -21,8 +22,20 @@
             document.getElementsByTagName("body")[0].style.opacity=1;
           });
     </script>
-    <style>
-    </style>
+    <script>
+        window.onload=function(){
+            const app = document.getElementsByClassName('views')[0];
+            const hammertime = new Hammer(app);
+            hammertime.on('swiperight', function(ev) {
+                changePage({method:'R'});
+                console.log(ev);
+        });
+            hammertime.on('swipeleft',function(ev) {
+                changePage({method:'L'});
+                console.log(ev);
+            })
+        }
+    </script>
   </head>
   <body>
     <div class="views">
@@ -41,6 +54,7 @@
                    <span></span>
                 </div>
             </div>
+            <div class="tabs-animated-wrap">
                 <div class="tabs">
                     <div id="tab1" class="view tab active">
                         <div class="keyboard" id="keyboard">
@@ -1011,6 +1025,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1019,7 +1034,5 @@
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/math.js"></script>
     <script type="text/javascript" src="js/myMath.js"></script>
-    <script>
-    </script>
   </body>
 </html>
