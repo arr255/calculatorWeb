@@ -2,9 +2,6 @@ img.button-img {
     max-width: 100%;
     max-height: 100%;
 }
-div.button-img {
-  
-}
 span.supleft {
     padding-right:0%;
 }
@@ -18,13 +15,10 @@ div.mainShow{
     height:30%;
     background-color: black;
 }
-div.views{
-
-}
 #result{
     color:cyan;
     height:30%;
-    margin-top: -5%;
+    margin-top: 35%;
     text-align: right;
     font-size:48px;
 }
@@ -34,6 +28,15 @@ div.views{
     text-align: left;
     padding-top:5%;
     font-size: 24px;
+    position: absolute;
+}
+#formula-buffer{
+    color:cyan;
+    height:65%;
+    text-align: left;
+    padding-top:5%;
+    font-size: 24px;
+    position:absolute;
 }
 #status{
     height:5%;
@@ -44,4 +47,8 @@ div.views{
 
 body{
     opacity: 0;
+}
+
+.button {
+    border-radius: 0;
 }

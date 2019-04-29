@@ -20,6 +20,11 @@ var dbName="MainDB";
 var db;
 var logNumber;
 var changed=false;
+var isFormulaBuffer=true;
+var formulaBuffer;
+var formulaPreview;
+var ifpending=false;
+var btnTimer;
 init();
 LogDBInit();
 /*
@@ -30,6 +35,18 @@ function init(){
     $$("a.button").css("height",buttonHeight+"px");
     $$("a").children().css("position","relative");
     $$("a").children().css("top",buttonHeight/3+"px");
+    initFormula="$"+cursor+"$"
+    currentFormula=initFormula;
+    page=1;//切换页面,取值为1,2,3,4
+    maxBrackets=0;//最大嵌套的括号层数
+    cursorOnTheLine=false;//光标是否在线上内
+    Already=true;//上一次计算完成
+    recordNumber=0;//记录条数
+    degMode="rad"
+    varColor="pink"
+    variable=['x'];
+    changed=false;
+    myApp.showTab("#tab"+String(page));
 }
 /*changeFormula()：按键后公式变动
     参数：formula:前端传入参数;
@@ -90,8 +107,8 @@ function searchFirstPara(formula,endSignal){
     if(formula.match(reg)){
         return RegExp.$1;
     }
-    //如果第一个参数为常数
-    reg=RegExp("((\\\\pi)|(\\\\mathrm\\{e\\}))"+endSignal);
+    //如果第一个参数为常数或变量
+    reg=RegExp("((\\\\pi)|(\\\\mathrm\\{e\\})|(\\{\\\\color\\{pink\\}x\\}))"+endSignal);
     if(formula.match(reg)){
         return RegExp.$1;
     }
@@ -137,6 +154,8 @@ function changePage(arg){
     //若为shift，奇数+1，偶数-1
     //若为LR，若为4的倍数+3或+4，-2；若为4的倍数+1或+2，+2
     if(arg.method=="shift"){
+        //禁止动画
+        $$('#animated').attr('class','');
         if(page%2==1){
             page+=1;
         }
@@ -145,6 +164,8 @@ function changePage(arg){
         }
     }
     else if(arg.method=="LR"){
+        //允许动画
+        $$('#animated').attr('class','tabs-animated-wrap');
         if(page%4==1||page%4==2){
             page+=2;
         }
@@ -153,11 +174,15 @@ function changePage(arg){
         }
     }
     else if(arg.method=='R'){
+        //允许动画
+        $$('#animated').attr('class','tabs-animated-wrap');
         if(page%4==3||page%4==0){
             page-=2;
         }
     }
     else if(arg.method=='L') {
+        //允许动画
+        $$('#animated').attr('class','tabs-animated-wrap');
         if (page%4==1||page%4==2){
             page+=2;
         }
@@ -230,6 +255,41 @@ function del(del=1){
 Already=false;
 reload();
 }
+
+/**
+ * 
+ * 递归，显示历史记录
+ * @param {* int} i 初始0
+ * @param {* str} str 初始''
+ * 
+ * Examples:
+ * showHistory(0,'')
+ * 
+ */
+function showHistory(i,str) {
+    $('#log_item').empty();
+    formula=getData(i).then((value)=>{
+        if(value) {
+            str+='<li><a href="#" class="item-link item-content" onclick="historyClick('+i+','+value.formula+')">\
+            <div class="item-title">'+value.formula+'</div></a></li>'
+            if(i<logNumber-1) {
+                showHistory(i+1,str);
+            }
+            else {
+                console.log(str);
+                $$('#log_item').append(str);
+            }
+        }
+    })
+}
+
+function historyClick(i,formula) {
+    alert("test");
+    Already=true;
+    currentLog=i;
+    currentFormula=formula;
+    reload();
+}
 /*
     clearHistory()
     清除历史记录
@@ -238,7 +298,7 @@ function clearHistory(){
      deleteData();
      alert("数据已清空！")
 }
-/* changeMode:改变模式
+/* changeRegMode:改变模式
     参数：mode.key
     return:none
 */
@@ -449,34 +509,35 @@ function mainCalculate(formula){
     //第三次处理，添加标号
     string=handleBrackets(formula);
     formula=handleBrackets(formula);
-    maxBrackets=1;
+    //maxBrackets=0;
     for(var i=maxBrackets;i>=0;i--){
         //字符串需要加上双重转义字符
         var signal="\\["+String(i)+"\\]";
         var reg=new RegExp("("+signal+"\\("+")"+"(.+?)"+"("+signal+"\\))",'g');
         var signalReg=new RegExp(signal,"g");
-        formula.match(reg);
-        var handledResult=String(calculate(RegExp.$2));//括号内计算结果
-        formula.match(reg);  //重新赋值
-        formula=formula.replace(reg,RegExp.$1+handledResult+RegExp.$3).replace(signalReg,"");
-        //console.log("result:"+formula);
+        var k=formula.match(reg);
+        var number=k?k.length:k=0;
+        for(m=0;m<number;m++){
+            var res=k[m].replace(RegExp(signal,'g'),'');
+            console.log(res);
+            var handledResult=String(res);//括号内计算结果
+            formula.match(reg);  //重新赋值
+            formula=formula.replace(k[m],handledResult).replace(signalReg,"");
+            console.log("result:"+formula);
+        }
     }
     formula=handleFactorial(formula);
     var finalResult=calculate(formula);
-    //alert(finalResult);
-    if(finalResult){
-        $$("#result").text(finalResult);
-        Already=true;
-        if(changed){
-            updateData(currentLog,{formula:logFormula,result:finalResult});
-        }
-        else{
-            currentLog+=1;
-            addData(logFormula,finalResult);
-        }
+    console.log(typeof(finalResult));
+
+    $$("#result").text(finalResult);
+    Already=true;
+    if(changed){
+        updateData(currentLog,{formula:logFormula,result:finalResult});
     }
     else{
-        alert("fail!");
+        currentLog+=1;
+        addData(logFormula,finalResult);
     }
 }
 /*
@@ -629,6 +690,30 @@ function handleDegree(formula){
     } 
     return formula;
 }
+
+function changeMode() {
+    var buttons = [
+        {
+            text: '标准',
+            onClick:function(){
+                deleteData();
+                init();
+                myApp.showTab("#tab"+String(page));
+            }
+        },
+        {
+            text: '统计',
+            onClick:function() {
+                window.location.href='statistics.html'
+            }
+        },
+        {
+            text: '取消',
+            color: 'red'
+        },
+    ];
+    myApp.actions(buttons);
+}
 /** 
  *    数据库indexedDB初始化 ,初始化logNumber,currentLog
 */
@@ -663,7 +748,16 @@ function LogDBInit(){
         currentLog = logNumber += 1;
     }
 }
-
+/**
+ * 查询日志数目
+ * 
+ * Syntax:
+ *   queryNumber()
+ * 
+ * Examples:
+ *   queryLogNumber().then((value)=>{console.log(value)})
+ * 
+ */
 function queryLogNumber(){
     return new Promise((resolve,rejected)=>{
         var objStore=db.transaction('log','readwrite').objectStore('log')
@@ -719,7 +813,7 @@ function getData(id){
     return new Promise((resolve,rejected)=>{
         var request=db.transaction(['log']).objectStore('log').get(id);
         request.onerror=function(event){
-            console.log("Query failed!")
+            console.log(request.result);
         }
         request.onsuccess=function(event){
             console.log(request.result);
@@ -727,6 +821,7 @@ function getData(id){
         }  
     })
 }
+
 /**
  * update data
  * 
@@ -750,6 +845,7 @@ function updateData(id,arg){
         var requestUpdate = objectStore.put(data);
         requestUpdate.onsuccess = function(event) {
             console.log("Update successfully");
+            changed=false;
         }
     }
 }
@@ -775,13 +871,29 @@ function deleteData(){
     用于页面改变时mathjax 重新渲染
 */
 function reload(){
-    $$("#formula").text(currentFormula);
-    $$("#formula").css("opacity",'0');
-    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-    MathJax.Hub.Queue(function () {
-        $$("#formula").css("opacity",1);
+    ifpending=true;
+    clearTimeout(btnTimer);
+    btnTimer=setTimeout(function(){
+        ifpending=false;
+        formulaBuffer.style.display='block';
+        formulaPreview.style.display='none';
+        isFormulaBuffer=!isFormulaBuffer;
+    },500);
+    if(isFormulaBuffer){
+        formulaBuffer=document.getElementById('formula-buffer');
+        formulaPreview=document.getElementById('formula');
+    }
+    else {
+        formulaBuffer=document.getElementById('formula');
+        formulaPreview=document.getElementById('formula-buffer');
+    }
+    // $$("#formula").text(currentFormula);
+    // $$("#formula").css("opacity",'0');
+    formulaBuffer.innerHTML=currentFormula;
+    // $$('#formula-buffer').text(currentFormula);
+    // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub,formulaBuffer],function () {
+        // $$("#formula").css("opacity",1);
+        
       });
-    setTimeout(function(){
-        $$("#formula").css("color","cyan");
-    },100);
 }
