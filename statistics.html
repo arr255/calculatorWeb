@@ -17,6 +17,7 @@
     <script type='text/javascript' src='js/jquery-3.4.0.min.js'></script>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
+          showProcessingMessages: false,
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
         });
         MathJax.Hub.Queue(function () {
@@ -49,213 +50,215 @@
                     <span id="deg">rad</span>
                 </div>
                 <div id="formula">
-                    ${\color{yellow}|}$
+
+                </div>
+                <div id='formula-buffer'>
                 </div>
                 <div class="result" id="result">
                    <span></span>
                 </div>
             </div>
-            <div class="tabs-animated-wrap" id="animated">
+            <div >
                 <div class="tabs">
                     <div id="tab1" class="view tab active">
                         <div class="keyboard" id="keyboard">
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-cyan" onclick="changePage({method:'shift'})">
+                                    <a class="button button-fill color-cyan">
                                         <span>Shift</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">forward</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="upButtonClick()">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">chevron_up</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">reply</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-red" onclick="del()">
+                                    <a class="button button-fill color-red" >
                                         <span><i class="f7-icons">delete-round</i></span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="clearContent()">
+                                    <a class="button button-fill" >
                                         <span> AC</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="moveLeft(1)">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">chevron_left</i></span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="downButtonClick()">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill">
                                         <span><i class="f7-icons">chevron_down</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="moveRight(1)">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">chevron_right</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill open-popup" data-popup='.history' onclick="showHistory(0,'')">
+                                    <a class="button button-fill open-popup" data-popup='.history' >
                                         <span><i class="f7-icons">time</i></span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black " onclick="changeFormula('\\pi')">
+                                    <a class="button button-fill color-black">
                                         <span>$\pi$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\ln(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\ln$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sin(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sin$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="changeFormula('\\cos(')">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>$\cos$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\tan(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\tan$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('{\\color{pink}x}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{2}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^2$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[2]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sqrt[]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$($</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula(')')">
+                                    <a class="button button-fill color-black" >
                                         <span>$)$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('7')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} Y}\ \ \ 7$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('8')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} Z}\ \ \ 8$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('9')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} M}\ \ \ 9$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\times}')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$\times \ ^{\tiny {\color{silver} {X^{n}}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\div}')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$\div \ ^{\tiny \color{silver}{\frac{\boxed{}}{\boxed{}}}}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('4')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F1}}\ \ \ 4$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('5')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F2}}\ \ \ 5$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('6')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F3}}\ \ \ 6$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{+}')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$+ \ ^{\small {\color{silver} {C_n^k}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{-}')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$- \ ^{\small {\color{silver}{P_{n}^{k}}}}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('1')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {GRP}}\ \ \ 1$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('2')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {FX}}\ \ \ 2$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('3')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {CCS}}\ \ \ 3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('Res')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$Res \ ^{\small {\color{silver}M}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="mainCalculate(currentFormula)">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$=$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('0')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {\%}}\ \ \ 0$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('.')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {。,,}}\ \ \ .$</span>
                                     </a>
                                 </div>
@@ -277,7 +280,7 @@
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-25">
-                                    <a class="button" onclick='changeMode()'>
+                                    <a class="button" >
                                         <i class="f7-icons">menu</i>
                                     </a>
                                 </div>
@@ -292,7 +295,7 @@
                                     </a>
                                 </div>
                                 <div class="col-25">
-                                    <a class="button" onclick="changePage({method:'LR'})">
+                                    <a class="button" >
                                         <i class="f7-icons">fastforward</i>
                                     </a>
                                 </div>
@@ -303,7 +306,7 @@
                         <div class="keyboard" id="keyboard">
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-cyan" onclick="changePage({method:'shift'})">
+                                    <a class="button button-fill color-cyan" >
                                         <span>Shift</span>
                                     </a>
                                 </div>
@@ -323,19 +326,19 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-red" onclick="del()">
+                                    <a class="button button-fill color-red" >
                                         <span><i class="f7-icons">delete-round</i></span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="clearContent()">
+                                    <a class="button button-fill" >
                                         <span> AC</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="moveLeft(1)">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">chevron_left</i></span>
                                     </a>
                                 </div>
@@ -345,159 +348,159 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="moveRight(1)">
+                                    <a class="button button-fill" >
                                         <span><i class="f7-icons">chevron_right</i></span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill open-popup" data-popup='.history' onclick="showHistory(0,'')">
+                                    <a class="button button-fill open-popup" data-popup='.history' >
                                         <span><i class="f7-icons">time</i></span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black " onclick="changeFormula('\\mathrm{e}')">
+                                    <a class="button button-fill color-black " >
                                         <span>$\mathrm{e}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\log(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\log$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\arcsin(')">
+                                    <a class="button button-fill color-black" >
                                         <span>${\sin}^{-1}$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="changeFormula('\\arccos(')">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>${\cos}^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\arctan(')">
+                                    <a class="button button-fill color-black" >
                                         <span>${\tan}^{-1}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{-1}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{3}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[3]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sqrt[3]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$($</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula(')')">
+                                    <a class="button button-fill color-black" >
                                         <span>$)$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('7')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} Y}\ \ \ 7$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('8')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} Z}\ \ \ 8$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('9')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} M}\ \ \ 9$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{\\underline{}}',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$x^n \ ^{\tiny {\color{silver} {\times}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="addFrac()">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$\frac{\boxed{}}{\boxed{}}\ ^{\tiny \color{silver}{\div}}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('4')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F1}}\ \ \ 4$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('5')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F2}}\ \ \ 5$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('6')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {F3}}\ \ \ 6$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('C_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$C_n^k \ ^{\small {\color{silver} {+}}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('P_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$P_{n}^{k} \ ^{\small {\color{silver}{-}}}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('1')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {GRP}}\ \ \ 1$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('2')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {FX}}\ \ \ 2$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('3')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {CCS}}\ \ \ 3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('Res')">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$Res \ ^{\small {\color{silver}M}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="mainCalculate(currentFormula)">
+                                    <a class="button button-fill color-black" >
                                         <span class="supright">$=$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('0')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {\%}}\ \ \ 0$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('.')">
+                                    <a class="button button-fill color-gray" >
                                         <span class="supleft">$^{\tiny \color{silver} {。,,}}\ \ \ .$</span>
                                     </a>
                                 </div>
@@ -519,7 +522,7 @@
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-25">
-                                    <a class="button" onclick='changeMode()'>
+                                    <a class="button" >
                                         <i class="f7-icons">menu</i>
                                     </a>
                                 </div>
@@ -534,7 +537,7 @@
                                     </a>
                                 </div>
                                 <div class="col-25">
-                                    <a class="button" onclick="changePage({method:'LR'})">
+                                    <a class="button" >
                                         <i class="f7-icons">fastforward</i>
                                     </a>
                                 </div>
@@ -545,223 +548,223 @@
                         <div class="keyboard" id="keyboard">
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-cyan" onclick="changePage({method:'shift'})">
+                                    <a class="button button-fill color-cyan" >
                                         <span>Shift</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="changeDegMode()">
+                                    <a class="button button-fill" >
                                         <span>RAD</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="upButtonClick()">
+                                    <a class="button button-fill" >
                                         <span>F(X)</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="window.location.href='canvas.html'">
+                                    <a class="button button-fill" >
                                         <span>Oxy</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="del()">
+                                    <a class="button button-fill" >
                                         <span>Graph</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('P_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span>$P_{n}^{k}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('C_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span>$C_{n}^{k}$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="downButtonClick()">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>$F_1$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="moveRight(1)">
+                                    <a class="button button-fill color-black" >
                                         <span>$F_2$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="clearHistory()">
+                                    <a class="button button-fill color-black" >
                                         <span>$F_3$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black " onclick="changeFormula('\\sqrt[3]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
+                                    <a class="button button-fill color-black " >
                                         <span>$\sqrt[3]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sqrt[\\underline{}]{}',{leftMove:4,cursorOnTheLine:true})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sqrt[n]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sin(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sin$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="changeFormula('\\cos(')">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>$\cos$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\tan(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\tan$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{3}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{\\underline{}}',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^n$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sinh(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sinh$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\cosh(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\cosh$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\tanh(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\tanh$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="addFrac()">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\frac{\boxed{}}{\boxed{}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('8')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\boxed{}\frac{\boxed{}}{\boxed{}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\equiv')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{MOD}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('GCD(,)',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\mathrm{GCD}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('LCM(,)',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\mathrm{LCM}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('!')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$X!$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\mathrm{e}^{\\underline{}}',{leftMove:2})">
+                                    <a class="button button-fill color-gray" >
                                         <span>$e^x$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\log(')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\log$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\int_{\\underline{}}^{}dx',{leftMove:7})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\int{}dx$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\delta(,)',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\delta /dx$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('^{-1}')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$X^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\mathrm{e}')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{e}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\log_{}()',{leftMove:3})">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{Log_{A}^{B}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sum_{\\color{pink}x=}^{}()',{leftMove:6})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\Sigma x$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\prod_{\\color{pink}x=}^{}()',{leftMove:6})">
+                                    <a class="button button-fill color-black" >
                                         <span>$\Pi x$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('\\mathrm{d}')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$D$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('^{\\circ}')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$° '\ ''$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('NPr(')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{NPr}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mid{}\\mid',{leftMove:5})">
+                                    <a class="button button-fill color-black" >
                                         <span>$|\ \ \ |$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-red">
-                                        <span>$del$</span>
+                                    <a class="button button-fill color-black">
+                                        <span>,</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-25">
-                                    <a class="button" onclick='changeMode()'>
+                                    <a class="button" >
                                         <i class="f7-icons">menu</i>
                                     </a>
                                 </div>
@@ -776,7 +779,7 @@
                                     </a>
                                 </div>
                                 <div class="col-25">
-                                    <a class="button" onclick="changePage({method:'LR'})">
+                                    <a class="button" >
                                         <i class="f7-icons">fastforward</i>
                                     </a>
                                 </div>
@@ -787,7 +790,7 @@
                         <div class="keyboard" id="keyboard">
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-cyan" onclick="changePage({method:'shift'})">
+                                    <a class="button button-fill color-cyan" >
                                         <span>Shift</span>
                                     </a>
                                 </div>
@@ -797,7 +800,7 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="upButtonClick()">
+                                    <a class="button button-fill" >
                                         <span>F(X)</span>
                                     </a>
                                 </div>
@@ -807,181 +810,181 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill" onclick="del()">
+                                    <a class="button button-fill" >
                                         <span>Graph</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('P_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span>$P_{n}^{k}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('C_{}^{}',{leftMove:4})">
+                                    <a class="button button-fill color-black" >
                                         <span>$C_{n}^{k}$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="downButtonClick()">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>$F_1$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="moveRight(1)">
+                                    <a class="button button-fill color-black" >
                                         <span>$F_2$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="clearHistory()">
+                                    <a class="button button-fill color-black" >
                                         <span>$F_3$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black " onclick="changeFormula('\\sqrt[3]{\\underline{}}',{leftMove:2,cursorOnTheLine:true})">
+                                    <a class="button button-fill color-black " >
                                         <span>$\sqrt[3]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\ln(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sqrt[n]{}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\arcsin(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sin^{-1}$</span>
                                     </a>
                                 </div>
-                                <div class="col-20 button-img" onclick="changeFormula('\\arccos(')">
+                                <div class="col-20 button-img" >
                                     <a class="button button-fill color-black">
                                         <span>$\cos^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\arctan(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\tan^{-1}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{3}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^3$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('^{\\underline{}}',{leftMove:2})">
+                                    <a class="button button-fill color-black" >
                                         <span>$x^n$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\sinh^{-1}(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\sinh^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\cosh^{-1}(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\cosh^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\tanh^{-1}(')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\tanh^{-1}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('7')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\frac{\boxed{}}{\boxed{}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('8')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\boxed{}\frac{\boxed{}}{\boxed{}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('9')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{MOD}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\times}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\mathrm{GCD}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{\\div}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\mathrm{LCM}$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('4')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$X!$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('5')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$e^x$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('6')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\log$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{+}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\int{}dx$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('\\mathrm{-}')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\delta /dx$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('1')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$X^{-1}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('2')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{e}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('3')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$\mathrm{Log_{A}^{B}}$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="changeFormula('Res')">
+                                    <a class="button button-fill color-black" >
                                         <span>$\Sigma x$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" onclick="mainCalculate(currentFormula)">
+                                    <a class="button button-fill color-black" >
                                         <span>$\Pi x$</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('0')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$D$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-gray" onclick="changeFormula('.')">
+                                    <a class="button button-fill color-gray" >
                                         <span>$° '\ ''$</span>
                                     </a>
                                 </div>
@@ -996,14 +999,14 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-red">
-                                        <span>$del$</span>
+                                    <a class="button button-fill color-black">
+                                        <span>,</span>
                                     </a>
                                 </div>
                             </div>
                             <div class="row no-gutter">
                                 <div class="col-25">
-                                    <a class="button" onclick='changeMode()'>
+                                    <a class="button" >
                                         <i class="f7-icons">menu</i>
                                     </a>
                                 </div>
@@ -1018,7 +1021,7 @@
                                     </a>
                                 </div>
                                 <div class="col-25">
-                                    <a class="button" onclick="changePage({method:'LR'})">
+                                    <a class="button" >
                                         <i class="f7-icons">fastforward</i>
                                     </a>
                                 </div>
@@ -1044,5 +1047,6 @@
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/math.js"></script>
     <script type="text/javascript" src="js/myMath.js"></script>
+    <script type="text/javascript" src='js/bind.js'></script>
   </body>
 </html>

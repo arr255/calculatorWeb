@@ -154,8 +154,6 @@ function changePage(arg){
     //若为shift，奇数+1，偶数-1
     //若为LR，若为4的倍数+3或+4，-2；若为4的倍数+1或+2，+2
     if(arg.method=="shift"){
-        //禁止动画
-        $$('#animated').attr('class','');
         if(page%2==1){
             page+=1;
         }
@@ -164,8 +162,6 @@ function changePage(arg){
         }
     }
     else if(arg.method=="LR"){
-        //允许动画
-        $$('#animated').attr('class','tabs-animated-wrap');
         if(page%4==1||page%4==2){
             page+=2;
         }
@@ -174,20 +170,17 @@ function changePage(arg){
         }
     }
     else if(arg.method=='R'){
-        //允许动画
-        $$('#animated').attr('class','tabs-animated-wrap');
         if(page%4==3||page%4==0){
             page-=2;
         }
     }
     else if(arg.method=='L') {
-        //允许动画
-        $$('#animated').attr('class','tabs-animated-wrap');
         if (page%4==1||page%4==2){
             page+=2;
         }
     }
     //console.log("chagePage:"+page);
+    console.log(page)
     myApp.showTab("#tab"+String(page));
 }
 /*
@@ -238,10 +231,19 @@ function clearContent(){
     返回：无
 */
 function del(del=1){
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}","[0-9]","\\.","\\\\pi",
-        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
+    var wholeSingnal=['{\\\\color{pink}x}','{\\\\color{pink}y}','{\\\\color{pink}z}','\\\\delta\\(',
+        "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}",
+        "[0-9]","\\.","\\\\pi","\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{",
+        "\\(","\\)","\\}",',']
     while(del>0){
-        for(i=0;i<wholeSingnal.length;i++){
+        if(currentFormula.match(RegExp('\\\\delta\\('+regCursor+',.*?\\)'))){
+            currentFormula=currentFormula.replace(RegExp('\\\\delta\\('+regCursor+',.*?\\)'),cursor);
+        }
+        else if(currentFormula.match(RegExp('\\\\int\\_\\{\\\\underline\\{'+regCursor+'\\}.+?dx'))){
+            currentFormula=currentFormula.replace(RegExp('\\\\int\\_\\{\\\\underline\\{'+regCursor+'\\}.+?dx'),cursor);
+        }
+        else{
+            for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
             if(currentFormula.match(reg)){
                 currentFormula=currentFormula.replace(reg,"$2");
@@ -249,7 +251,8 @@ function del(del=1){
                 break;
             }
         }
-        del-=1;
+            del-=1;
+    }
     }
 //console.log("moveLefted:"+currentFormula);
 Already=false;
@@ -644,6 +647,38 @@ function handleString(str){
     str=str.replace(/\\mid\{(.+?)\}\\mid/,"math.abs($1)")
     return str;
 }
+
+function LatexTostr(str) {
+    //删除光标
+    str=str.replace(cursor,"");
+    str=str.replace(/\$/g,"");
+    //删除下划线
+    str=str.replace(/\\underline\{(.+?)\}/,"$1");
+    //处理加减乘除
+    str=str.replace(/\\mathrm{\\times}/g,"*");
+    str=str.replace(/\\mathrm{\\div}/g,"/");
+    //排列组合处理
+    str=str.replace(/C_\{(.+?)\}\^\{(.+?)\}/g,"math.combinations($1,$2)");
+    str=str.replace(/P_\{(.+?)\}\^\{(.+?)\}/g,"math.permutations($1,$2)");
+    //加减乘除处理
+    str=str.replace(/\\mathrm\{\+\}/g,"+");//替换加号;
+    str=str.replace(/\\mathrm\{\-\}/g,"-");//替换减号；
+    str=str.replace(/\\pi/g,3.14159265359);//替换PI
+    str=str.replace(/\\mathrm\{e\}/g,"2.718281828459");//替换自然对数E；
+    str=str.replace(/\\times/g,"*");
+    str=str.replace(/\\div/,"/");
+    str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"$2/$1");
+    str=str.replace(/GCD/g,"gcd")
+    str=str.replace(/LCM/g,"lcm")
+    //seventh row
+    str=str.replace(/\\log_\{(.+?)\}\((.+?)\)/g,"log($2,$1)");
+    //eighth row
+    str=str.replace(/\\mid\{(.+?)\}\\mid/,"abs($1)")
+
+    str=str.replace(/\{\\color\{pink\}x\}/g,'x');
+    str=str.replace(/\{(\d*)\}/,'$1');
+    return str;
+}
 /*
 处理阶乘
     handleFactorial(formula)
@@ -865,6 +900,44 @@ function deleteData(){
     }
 }
 
+/**
+ * 
+ * Graph Btn Click,choose which function to plot
+ * 
+ */
+function plotBtn() {
+    expr=currentFormula;
+    var buttons = [
+        {
+            text: '绘制为F1',
+            onClick: function () {
+                plot('F1',expr);
+            }
+        },
+        {
+            text: '绘制为F2',
+            onClick: function () {
+                plot('F2',expr)
+            }
+        },
+        {
+            text: '绘制为F3',
+            onClick: function () {
+                plot('F3',expr)
+            }
+        },
+        {
+            text: '取消',
+            color: 'red',
+        },
+    ];
+    myApp.actions(buttons);
+}
+
+function plot(Fx,expr) {
+    expr=LatexTostr(expr);
+    window.location.href='plot.html?'+Fx+'='+expr;
+}
 
 /*
     reload()：重新载入
@@ -890,6 +963,7 @@ function reload(){
     // $$("#formula").text(currentFormula);
     // $$("#formula").css("opacity",'0');
     formulaBuffer.innerHTML=currentFormula;
+    $$("#result").text('');
     // $$('#formula-buffer').text(currentFormula);
     // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub,formulaBuffer],function () {
