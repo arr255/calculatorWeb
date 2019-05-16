@@ -936,7 +936,8 @@ function plotBtn() {
 
 function plot(Fx,expr) {
     expr=LatexTostr(expr);
-    window.location.href='plot.html?'+Fx+'='+expr;
+    var href='plot.html?'+Fx+'='+expr;
+    window.location.href='plot.html?'+encodeURI(Fx+'='+expr);
 }
 
 /*
