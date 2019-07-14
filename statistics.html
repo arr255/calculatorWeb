@@ -15,6 +15,12 @@
     <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="js/hammer.min.js"></script>
     <script type='text/javascript' src='js/jquery-3.4.0.min.js'></script>
+    <style>
+        #staData { 
+            background-color: black;
+            color:white;
+        }
+    </style>
     <script type="text/x-mathjax-config">
         MathJax.Hub.Config({
           showProcessingMessages: false,
@@ -49,16 +55,26 @@
                     <span id="cal">cal</span>
                     <span id="deg">rad</span>
                 </div>
-                <div id="formula">
+                <div class='row' style="height:95%">
+                    <div id='leftPannel' class='col-60' style="height:100%">
+                        <div id="formula">
+                        </div>
+                        <div id='formula-buffer'>
+                        </div>
+                    </div>
+                    <div id='rightPannel' class='col-40' style="height:100%;border-left:1px solid cyan">
+                        <div class="page-content infinite-scroll">
+                            <div class='list-block'>
+                                <ul id='staData'>
+                                        <input type="number" id='inputData' style="color:white">
+                                </ul>
 
-                </div>
-                <div id='formula-buffer'>
-                </div>
-                <div class="result" id="result">
-                   <span></span>
+                            </div>
+                        </div>
+                   </div>
                 </div>
             </div>
-            <div >
+            <div>
                 <div class="tabs">
                     <div id="tab1" class="view tab active">
                         <div class="keyboard" id="keyboard">
@@ -241,8 +257,8 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" >
-                                        <span class="supright">$Res \ ^{\small {\color{silver}M}}$</span>
+                                    <a class="button button-fill color-black">
+                                        <span class="supright" style="color:cyan">Xi+</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
@@ -483,8 +499,8 @@
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
-                                    <a class="button button-fill color-black" >
-                                        <span class="supright">$Res \ ^{\small {\color{silver}M}}$</span>
+                                    <a class="button button-fill color-black">
+                                        <span class="supright" style="color:cyan">Xi+</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
@@ -657,12 +673,12 @@
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
                                     <a class="button button-fill color-gray" >
-                                        <span>$\frac{\boxed{}}{\boxed{}}$</span>
+                                        <span>$r$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
                                     <a class="button button-fill color-gray" >
-                                        <span>$\boxed{}\frac{\boxed{}}{\boxed{}}$</span>
+                                        <span>$\theta$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
@@ -899,12 +915,12 @@
                             <div class="row no-gutter">
                                 <div class="col-20 button-img">
                                     <a class="button button-fill color-gray" >
-                                        <span>$\frac{\boxed{}}{\boxed{}}$</span>
+                                        <span>$r$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
                                     <a class="button button-fill color-gray" >
-                                        <span>$\boxed{}\frac{\boxed{}}{\boxed{}}$</span>
+                                        <span>$\theta$</span>
                                     </a>
                                 </div>
                                 <div class="col-20 button-img">
@@ -1047,6 +1063,7 @@
     <script type="text/javascript" src="js/main.js"></script>
     <script type="text/javascript" src="js/math.js"></script>
     <script type="text/javascript" src="js/myMath.js"></script>
-    <script type="text/javascript" src='js/bind.js'></script>
+    <script type="text/javascript" src='js/staBind.js'></script>
+    <script type='text/javascript' src='js/statistics.js'></script>
   </body>
 </html>

@@ -185,7 +185,7 @@ function prodFromServer(expr,downNumber,upNumber){
     console.log(expr)
     res="";
     $$.ajax({
-        url:"http://127.0.0.1:12345/calPage/myProd",
+        url:"http://www.guomf.top:8002/calPage/myProd",
         method:"get",
         data:{"formula":expr,"downNumber":downNumber,"upNumber":upNumber},
         async:false,

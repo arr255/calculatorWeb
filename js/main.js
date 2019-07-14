@@ -13,7 +13,8 @@ var maxBrackets=0;//最大嵌套的括号层数
 var cursorOnTheLine=false;//光标是否在线上内
 var Already=true;//上一次计算完成
 var recordNumber=0;//记录条数
-var degMode="rad"
+var degMode="rad";
+var mainMode='CAL';
 var varColor="pink"
 var variable=['x'];
 var dbName="MainDB";
@@ -47,6 +48,7 @@ function init(){
     variable=['x'];
     changed=false;
     myApp.showTab("#tab"+String(page));
+    changeMainMode();
 }
 /*changeFormula()：按键后公式变动
     参数：formula:前端传入参数;
@@ -532,8 +534,10 @@ function mainCalculate(formula){
     formula=handleFactorial(formula);
     var finalResult=calculate(formula);
     console.log(typeof(finalResult));
-
     $$("#result").text(finalResult);
+    if(finalResult!='' && finalResult!=null) {
+        localStorage.setItem('lastResult',finalResult);
+    }
     Already=true;
     if(changed){
         updateData(currentLog,{formula:logFormula,result:finalResult});
@@ -733,13 +737,33 @@ function changeMode() {
             onClick:function(){
                 deleteData();
                 init();
+                mainMode='CAL';
+                setMainMode('CAL');
+                window.location.href='index.html';
                 myApp.showTab("#tab"+String(page));
             }
         },
         {
             text: '统计',
             onClick:function() {
-                window.location.href='statistics.html'
+                var buttons=[
+                    {
+                        text:'单变量',
+                        onClick:function() {
+                            setMainMode('STA');
+                            window.location.href='statistics.html?parameter=1';
+                        }
+                    },
+                    {
+                        text:'双变量',
+                        onClick:function() {
+                            setMainMode('STA');
+                            window.location.href='statistics.html?parameter=2';
+                        }
+                    }
+                ];
+                myApp.actions(buttons);
+                mainMode='STA';
             }
         },
         {
@@ -748,6 +772,19 @@ function changeMode() {
         },
     ];
     myApp.actions(buttons);
+}
+
+function changeMainMode() {
+    var mainMode=localStorage.getItem('mainMode');
+    if(!mainMode) {
+        localStorage.setItem('mainMode','CAL');
+    }
+    else {
+        $('#cal').text(mainMode);
+    }
+}
+function setMainMode(mainMode) {
+    localStorage.setItem('mainMode',mainMode);
 }
 /** 
  *    数据库indexedDB初始化 ,初始化logNumber,currentLog
