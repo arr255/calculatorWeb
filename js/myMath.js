@@ -67,6 +67,7 @@ function Npr(x){
         }
     }
 }
+
 function integral(expr,downNumber,upNumber,variable){
     var intNumber=1000;//积分次数
     var eachInterval=(upNumber-downNumber)/intNumber;//间隔

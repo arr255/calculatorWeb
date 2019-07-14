@@ -535,7 +535,7 @@ function mainCalculate(formula){
     var finalResult=calculate(formula);
     console.log(typeof(finalResult));
     $$("#result").text(finalResult);
-    if(finalResult!='' && finalResult!=null) {
+    if(math.isNumeric(parseFloat(finalResult))) {
         localStorage.setItem('lastResult',finalResult);
     }
     Already=true;

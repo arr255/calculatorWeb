@@ -74,6 +74,7 @@ bind(37,'tap','changeFormula("E")');
 bind(37,'press','changeFormula("\\\\mathrm{e}^{\\\\underline{}}",{leftMove:2})');
 bind(39,'tap','changeFormula("\\\\color{green}=")')
 bind(40,'tap','changeMode()');
+bind(42,'tap','showStaResult()');
 bind(43,'tap','changePage({method:"LR"})');
 //Page Two
 bind(44,'tap','changePage({method:"shift"})');
@@ -138,6 +139,7 @@ bind(81,'press','changeFormula("E")');
 bind(81,'tap','changeFormula("\\\\mathrm{e}^{\\\\underline{}}",{leftMove:2})');
 bind(83,'tap','changeFormula("\\\\color{green}=")')
 bind(84,'tap','changeMode()');
+bind(86,'tap','showStaResult()');
 bind(87,'tap','changePage({method:"LR"})');
 
 //Page Three
@@ -185,6 +187,7 @@ bind(125,'tap','changeFormula("NPr(")');
 bind(126,'tap','changeFormula("\\\\mid{}\\\\mid",{leftMove:5})');
 bind(127,'tap','changeFormula(",")');
 bind(128,'tap','changeMode()');
+bind(130,'tap','showStaResult()');
 bind(131,'tap','changePage({method:"LR"})');
 
 //page four
@@ -231,4 +234,5 @@ bind(169,'tap','changeFormula("NPr(")');
 bind(170,'tap','changeFormula("\\\\mid{}\\\\mid",{leftMove:5})');
 bind(171,'tap','changeFormula("changeFormula(",")")');
 bind(172,'tap','changeMode()');
+bind(174,'tap','showStaResult()');
 bind(175,'tap','changePage({method:"LR"})');
