@@ -49,7 +49,7 @@ bind(22,'tap','changeFormula(9)');
 bind(22,'press','changeFormula("{\\\\color{pink}M}")');
 bind(23,'tap','changeFormula("\\\\mathrm{\\\\times}")');
 bind(23,'press','changeFormula("^{\\\\underline{}}",{leftMove:2})');
-bind(24,'tap','changeFormula("\\\\mathrm{\\\\times}")');
+bind(24,'tap','changeFormula("\\\\mathrm{\\\\div}")');
 bind(24,'press','addFrac()')
 bind(25,'tap','changeFormula(4)');
 bind(25,'press','changeFormula("{\\\\color{pink}F1")');

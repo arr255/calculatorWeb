@@ -671,7 +671,7 @@ function LatexTostr(str) {
     str=str.replace(/\\mathrm\{e\}/g,"2.718281828459");//替换自然对数E；
     str=str.replace(/\\times/g,"*");
     str=str.replace(/\\div/,"/");
-    str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"$2/$1");
+    str=str.replace(/\\frac\{(.+?)\}\{(.+?)\}/g,"$1/$2");
     str=str.replace(/GCD/g,"gcd")
     str=str.replace(/LCM/g,"lcm")
     //seventh row
@@ -974,6 +974,7 @@ function plotBtn() {
 function plot(Fx,expr) {
     expr=LatexTostr(expr);
     var href='plot.html?'+Fx+'='+expr;
+    localStorage.setItem(Fx+'Expr',expr);
     window.location.href='plot.html?'+encodeURI(Fx+'='+expr);
 }
 
