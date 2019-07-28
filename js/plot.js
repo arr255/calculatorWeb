@@ -70,6 +70,7 @@ function setButtonStatus() {
 function plot(){
   calculator.setBlank();
   if(F1Status) {
+    calculator.setBlank();
     calculator.setExpressions([
       {id:'graph1', latex:handleExpr(expr1)},
     ])
@@ -84,5 +85,12 @@ function plot(){
     calculator.setExpressions([
       {id:'graph3', latex:handleExpr(expr3)},
     ])
+  }
+}
+
+function backToMainMode(){
+  var currentMode=localStorage.getItem('currentMode');
+  if(currentMode=='CAL') {
+    window.location.href='index.html';
   }
 }

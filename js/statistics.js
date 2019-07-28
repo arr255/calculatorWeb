@@ -1,5 +1,6 @@
 var type='single';
-var currentData=1;
+currentData=1;
+localStorage.setItem('currentData',1);
 var parameter=window.location.href.match(RegExp('.+?parameter\\=(\\d)'))[1];
 var singleData=new Array;
 var doubleData=new Array;
@@ -8,6 +9,16 @@ doubleData[1]=new Array;
 var currentPara='x';
 if(parameter=='2') {
     type='double';
+    var doubleDataNumber=parseInt(localStorage.getItem('doubleDataNumber'));
+    console.log(localStorage.getItem('y1'))
+    if(doubleDataNumber) {
+        for(i=1;i<doubleDataNumber;i++){
+            doubleData[0][i]=localStorage.getItem('x'+i);
+            doubleData[1][i]=localStorage.getItem('y'+i);
+            addItem(doubleData[0][i]);
+            addItem(doubleData[1][i]);
+        }
+    }
 }
 else {
     type='single';
@@ -20,6 +31,7 @@ function Xi(){
     }
 }
 function addItem(item) {
+    currentData=parseInt(localStorage.getItem('currentData'));
     if(type=='single') {
         singleData[currentData-1]=item;
         var newNode='<li class="item-content">\
@@ -27,18 +39,22 @@ function addItem(item) {
           <div class="item-title" id="item_'+currentData+'" onclick="changeDataOnclick('+currentData+')">x'+currentData+'='+item+'</div>';
         $('#staData').append(newNode);
         currentData+=1;
+        localStorage.setItem('currentData',currentData);
     }
     else if(type=='double') {
         if(currentPara=='x') {
-            doubleData[0][currentData-1]=item;
+            doubleData[0][currentData]=item;
             var newNode='<li class="item-content">\
             <div class="item-inner">\
               <div class="item-title" id="item_'+currentData+'" onclick="changeDataOnclick('+currentData+')">x'+currentData+'='+item+'</div>';
             $('#staData').append(newNode);
             currentPara='y';
+            localStorage.setItem('doubleDataNumber',currentData);
+            localStorage.setItem('x'+currentData,item);
         }
         else if(currentPara=='y') {
-            doubleData[1][currentData-1]=item;
+            doubleData[1][currentData]=item;
+            localStorage.setItem('y'+currentData,item);
             // var newNode='<li class="item-content">\
             // <div class="item-inner">\
             //   <div class="item-title" id="item_'+currentData+'" onclick="changeData('+currentData+')">y'+currentData+'='+item+'</div>';
@@ -46,6 +62,8 @@ function addItem(item) {
             $('#item_'+currentData).text($('#item_'+currentData).text()+'  y'+currentData+'='+item);
             currentPara='x';
             currentData+=1;
+            localStorage.setItem('currentData',currentData);
+            localStorage.setItem('doubleDataNumber',currentData);
         }
     }
 }
@@ -60,12 +78,14 @@ function changeData(data,toBeChanged) {
           }
           else {
             if(toBeChanged=='x') {
-                doubleData[0][data-1]=value;
-                $('#item_'+data).text('x'+data+'='+value+'  y'+data+'='+doubleData[1][data-1]);
+                doubleData[0][data]=value;
+                $('#item_'+data).text('x'+data+'='+value+'  y'+data+'='+doubleData[1][data]);
+                localStorage.setItem('x'+data,value);
             }
             else if(toBeChanged=='y') {
-                doubleData[1][data-1]=value;
-                $('#item_'+data).text('x'+data+'='+doubleData[0][data-1]+'  y'+data+'='+value);
+                doubleData[1][data]=value;
+                $('#item_'+data).text('x'+data+'='+doubleData[0][data]+'  y'+data+'='+value);
+                localStorage.setItem('y'+data,value);
             }
           }
       }
@@ -125,7 +145,7 @@ function showStaResult() {
     else {
         //存储数据
         localStorage.setItem('doubleDataNumber',currentData);
-        for(i=0;i<currentData;i++) {
+        for(i=1;i<currentData;i++) {
             localStorage.setItem('x'+i,doubleData[0][i]);
             localStorage.setItem('y'+i,doubleData[1][i]);
         }

@@ -300,8 +300,32 @@ function historyClick(i,formula) {
     清除历史记录
 */
 function clearHistory(){
-     deleteData();
-     alert("数据已清空！")
+    var buttons=[
+        {
+            text:'清除统计数据',
+            onClick:function() {
+                clearStaData();
+            }
+        },
+        {
+            text:'清除计算数据',
+            onClick:function() {
+                deleteData();
+            }
+        },
+        {
+            text:'清除全部数据',
+            onClick:function() {
+                clearStaData();
+                deleteData();
+            }
+        },
+        {
+            text:'取消',
+            color:'red'
+        }
+    ]
+     myApp.actions(buttons);
 }
 /* changeRegMode:改变模式
     参数：mode.key
@@ -751,6 +775,7 @@ function changeMode() {
                         text:'单变量',
                         onClick:function() {
                             setMainMode('STA');
+                            localStorage.setItem('Sparameter',1);
                             window.location.href='statistics.html?parameter=1';
                         }
                     },
@@ -758,6 +783,7 @@ function changeMode() {
                         text:'双变量',
                         onClick:function() {
                             setMainMode('STA');
+                            localStorage.setItem('SParameter',2);
                             window.location.href='statistics.html?parameter=2';
                         }
                     }
@@ -975,6 +1001,7 @@ function plot(Fx,expr) {
     expr=LatexTostr(expr);
     var href='plot.html?'+Fx+'='+expr;
     localStorage.setItem(Fx+'Expr',expr);
+    localStorage.setItem('currentMode',mainMode);
     window.location.href='plot.html?'+encodeURI(Fx+'='+expr);
 }
 
@@ -1009,4 +1036,19 @@ function reload(){
         // $$("#formula").css("opacity",1);
         
       });
+}
+
+/**
+ * 清除统计数据
+ * doubleDataNumber数据即为currentData,比实际数据对数大一，因而循环时不必减一;
+ */
+function clearStaData(){
+    var doubleDataNumber=localStorage.getItem('doubleDataNumber');
+    for(i=0;i<=doubleDataNumber;i++) {
+        window.localStorage.removeItem('x'+i);
+        window.localStorage.removeItem('y'+i);
+        $('#staData').empty();
+        localStorage.setItem('currentData',1);
+    }
+    window.localStorage.removeItem('doubleDataNumber');
 }

@@ -11,7 +11,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script src="js/calculator.js"></script>
-
+  <script type="text/javascript" src="Framework7-1.4.2/dist/js/framework7.min.js"></script>
+  <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.min.css">
+  <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.colors.min.css">
+  <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7-icons.css">
+  <script type='text/javascript' src='js/jquery-3.4.0.min.js'></script>
   <style>
     html,body {
       width: 100%;
@@ -27,7 +31,13 @@
   </style>
 </head>
 <body>
-  <div id="calculator"></div>
+  <div id="calculator" style="top:-36px">
+    <div  style="height:36px;width:48px;top:36px;position: relative;z-index: 1">
+      <button  class='button button-fill color-red' onclick="backToMainMode()">返回</button>
+      <button  class='button button-fill color-green' onclick="showCurve()" id='showCurve'>显示拟合曲线</button>
+      <p id='polyfitExpr' style="font-size:24px"></p>
+    </div>
+  </div>
   <script src='js/statisticsPlot.js'></script>
   
 
