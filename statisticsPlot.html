@@ -31,13 +31,94 @@
   </style>
 </head>
 <body>
-  <div id="calculator" style="top:-36px">
-    <div  style="height:36px;width:48px;top:36px;position: relative;z-index: 1">
-      <button  class='button button-fill color-red' onclick="backToMainMode()">返回</button>
-      <button  class='button button-fill color-green' onclick="showCurve()" id='showCurve'>显示拟合曲线</button>
-      <p id='polyfitExpr' style="font-size:24px"></p>
+    <div class="views">
+        <div class="view view-main">
+          <div class="pages">
+            <div data-page="home" class="page">
+              <div class="tabs">
+                <div id="tab1" class="view tab active">
+                  <div id="calculator" style="top:-36px">
+                      <div  style="height:36px;width:48px;top:36px;position: relative;z-index: 1">
+                        <button  class='button button-fill color-red' onclick="backToMainMode()">返回</button>
+                        <button  class='button button-fill color-green' onclick="showCurve()" id='showCurve'>显示拟合曲线</button>
+                        <button  class='button button-fill color-green' onclick="showInfo()" id='showCurve'>显示数据信息</button>
+                        <p id='polyfitExpr' style="font-size:24px"></p>
+                      </div>
+                  </div>
+                </div>
+                <div id='tab2' class="view tab">
+            `      <div class="page-content">
+                <div style="height:5px;float:right"><i class="f7-icons" onclick="closeData()">close</i></div>
+                <div class="list-block">
+                    <ul>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title"><span style="font-weight:bold">拟合函数</span></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title" id='polyfitFunction'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title"><span style="font-weight:bold">判定系数</span></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title" id='determination'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title"><span style="font-weight:bold">具体参数</span></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                               <div class="item-title" id='sigmaX'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title" id='sigmaX2'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                                <div class="item-inner">
+                                    <div class="item-title" id='sigmaY'></div>
+                                </div>
+                            </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title" id='sigmaY2'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title" id='sigmaXY'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title" id='MeanX'></div>
+                            </div>
+                        </li>
+                        <li class="item-content">
+                            <div class="item-inner">
+                                <div class="item-title" id='MeanY'></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
     </div>
-  </div>
   <script src='js/statisticsPlot.js'></script>
   
 

@@ -1,6 +1,5 @@
 var myApp = new Framework7();
-
-var res;
+var receiveData;
 var elt = document.getElementById('calculator');
 var calculator = Desmos.GraphingCalculator(elt, {
   expressions: false
@@ -49,7 +48,7 @@ function showCurve() {
     {
       text:'直线拟合',
       onClick:function() {
-
+        drawPolyfit(1);
       }
     },
     {
@@ -89,12 +88,6 @@ function showCurve() {
             )}
           },
           {
-            text:'展示2-5次结果',
-            onClick:function() {
-
-            }
-          },
-          {
             text:'取消',
             color:'red'
           }
@@ -119,8 +112,8 @@ function polyfitFromServer(x,y,n) {
     async:false,
     dataType:"json",
     success:function(data){
-        res=data.result;
-        console.log(res);
+      res=data;
+        console.log(data);
     },
     error:function(){
         res= "";
@@ -130,8 +123,8 @@ return res;
 }
 
 function drawPolyfit(n) {
-  var res=polyfitFromServer(x,y,n);
-  res=res.replace('[','').replace(']','').split(',');
+  receiveData=polyfitFromServer(x,y,n);
+  res=receiveData.results.replace('[','').replace(']','').split(',');
   var expr='';
   for(i=0;i<=n;i++) {
     expr=expr+res[i]+'x^'+(n-i)+'+';
@@ -152,4 +145,47 @@ function drawPolyfit(n) {
   calculator.setExpressions([
     {id:'graph1', latex:expr},
   ])
+}
+
+function showInfo() {
+  if(!receiveData) {
+    alert('请先拟合曲线');
+  }
+  else {
+    var res=receiveData.results.replace('[','').replace(']','').split(',');
+    var determination=receiveData.determination;
+    var sigmaX=receiveData.sigmaX;
+    var sigmaX2=receiveData.sigmaX2;
+    var sigmaY=receiveData.sigmaY;
+    var sigmaY2=receiveData.sigmaY2;
+    var sigmaXY=receiveData.sigmaXY;
+    var meanX=receiveData.meanX;
+    var meanY=receiveData.meanY;
+    var n=res.length-1;
+    $('#polyfitFunction').empty();
+    for(i=0;i<=n;i++){
+      if(i<n-1) {
+        $('#polyfitFunction').append(res[i]+'x<sup>'+(n-i)+'</sup>+');
+      }
+      else if(i==n-1) {
+        $('#polyfitFunction').append(res[i]+'x+');
+      }
+      else {
+        $('#polyfitFunction').append(res[i]);
+      }
+    }
+    $('#determination').empty().append('R<sup>2</sup>='+determination)
+    $('#sigmaX').empty().append('&#931;='+sigmaX);
+    $('#sigmaX2').empty().append('&Sigma;X<sup>2</sup>='+sigmaX2);
+    $('#sigmaY').empty().append('&#931;='+sigmaY);
+    $('#sigmaY2').empty().append('&Sigma;Y<sup>2</sup>='+sigmaY2);
+    $('#sigmaXY').empty().append('&Sigma;Y<sup>2</sup>='+sigmaXY);
+    $('#meanX').empty().append('X平均值='+meanX);
+    $('#meanY').empty().append('Y平均值='+meanY);
+    myApp.showTab('#tab2');
+  }
+}
+
+function closeData() {
+  myApp.showTab('#tab1');
 }
