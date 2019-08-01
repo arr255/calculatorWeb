@@ -26,6 +26,8 @@ var formulaBuffer;
 var formulaPreview;
 var ifpending=false;
 var btnTimer;
+
+var testPara;
 init();
 LogDBInit();
 /*
@@ -350,7 +352,8 @@ function moveLeft(lm){
         changed=true;
     }
     var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
-                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
+                        ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[']
     while(lm>0){
         for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
@@ -372,7 +375,8 @@ function moveRight(rm){
         changed=true;
     }
     var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\\\mid","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
-                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}"]
+                        "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
+                        ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[']
     while(rm>0){
         for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+regCursor+")("+wholeSingnal[i]+")");
@@ -505,11 +509,44 @@ function calculate(string){
     string=handleString(string);
     string=handleFactorial(string);
     string=handleDegree(string);
+    string=handleMatrix(string);
     console.log("Calculaor HandledString:"+string);
-    if(string.match(/^\d+\,\d+$/)){
+    if(string.match(/^\d+\,\d+$/) && !string.match(/\[\[\d+\,\d+/)){
         return string;
     }
-    var result=eval(string);
+    //矩阵
+    if(string.match(/\[\[\d/)) {
+        string=string.replace(/(\[\[.+?\]\])\-(\[\[.+?\]\])/,'math.subtract($1,$2)');
+        string=string.replace(/(\[\[.+?\]\])\+(\[\[.+?\]\])/,'math.add($1,$2)');
+        string=string.replace(/((\d|\.)+)\*(\[\[.+?\]\])/,'math.multiply($1,$3)');
+        string=string.replace(/(\[\[.+?\]\])\*((\d|\.)+)/,'math.multiply($1,$2)');
+        string=string.replace(/(\[\[.+?\]\])\/((\d|\.)+)/,'math.divide($1,$2)');
+        string=string.replace(/((\d|\.)+)\/(\[\[.+?\]\])/,'math.divide($1,$3)');
+    }
+    console.log(string);
+    var result;
+    try {
+        // var result=eval(string);
+        //最外层函数
+        while(1) {
+            var res=string.match(/([a-z|A-Z]+?\.)?[a-z|A-Z]+?\([^\(]+?\)/g);
+            if(res) {
+                for(i=0;i<res.length;i++) {
+                    console.log(res[i]);
+                    string=string.replace(res[i],eval(res[i]));
+                }
+            }
+            else {
+                console.log(string);
+                break;
+            }
+        }
+        var result=string;
+    }
+    catch(error) {
+        console.log(error);
+    };
+    
     ApproResult=math.round(parseFloat(result),7);
     if(ApproResult){
         result=ApproResult;
@@ -634,7 +671,7 @@ function handleString(str){
     str=str.replace(/\\div/,"/");
     //三角函数处理
     if(degMode=="rad"){
-        str=str.replace(/(\\sin\()(.+?)\)/g,"math.sin($2)");
+        str=str.replace(/\\sin\(/g,"math.sin(");
         str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
         str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
         str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
@@ -790,6 +827,14 @@ function changeMode() {
                 ];
                 myApp.actions(buttons);
                 mainMode='STA';
+            }
+        },
+        {
+            text:'矩阵',
+            onClick:function() {
+                mainMode='MAT';
+                setMainMode('MAT');
+                window.location.href='matrix.html';
             }
         },
         {
@@ -1051,4 +1096,41 @@ function clearStaData(){
         localStorage.setItem('currentData',1);
     }
     window.localStorage.removeItem('doubleDataNumber');
+}
+
+/**
+ * 处理矩阵
+ * @param {str} expr 表达式
+ */
+function handleMatrix(expr) {
+    console.log(expr);
+    var mat=expr.match(/\\tiny\{\\left\[\\begin\{matrix}(.+?)\\\\\\end\{matrix\}\\right\]\}/g);
+    if(mat) {
+        for(i=0;i<mat.length;i++) {
+            var matrixExpr=mat[i];
+            var matrixData=matrixExpr.match(/\\tiny\{\\left\[\\begin\{matrix}(.+?\\\\)\\end\{matrix\}\\right\]\}/g);
+            matrixData=RegExp.$1;
+            var row=parseInt(matrixData.match(/\\\\/g).length)
+            var data=matrixData.match(/(?<=\[)(.*?)(?=\])/g)
+            console.log(data);
+            var column=data.length/row;
+            var arr='[';
+            for(m=0;m<row;m++) {
+                arr+='[';
+                for(n=0;n<column;n++) {
+                    arr+=data[m*column+n]+',';
+                }
+                arr=arr.replace(/\,$/,'');
+                arr+='],';
+            }
+            arr=arr.replace(/\,$/,'');
+            arr+=']'
+            expr=expr.replace(matrixExpr,String(arr));
+        }
+        return expr;
+    }
+    else {
+        return expr;
+    }
+
 }

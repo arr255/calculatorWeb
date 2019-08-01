@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <title>My App</title>
+    <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.min.css">
+    <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7.ios.colors.min.css">
+    <link rel="stylesheet" href="Framework7-1.4.2/dist/css/framework7-icons.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="icon" href='src/favicon.png' type="image/x-icon">
+    <link rel='short-cut icon' href='src/favicon.png' type="image/x-icon">  
+    <script type="text/javascript" src="src/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="js/hammer.min.js"></script>
+    <script type='text/javascript' src='js/jquery-3.4.0.min.js'></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+          showProcessingMessages: false,
+          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+        });
+        MathJax.Hub.Queue(function () {
+            document.getElementsByTagName("body")[0].style.opacity=1;
+          });
+    </script>
+    <script>
+        window.onload=function(){
+            const app = document.getElementsByClassName('views')[0];
+            const hammertime = new Hammer(app);
+            hammertime.on('swiperight', function(ev) {
+                changePage({method:'R'});
+                console.log(ev);
+        });
+            hammertime.on('swipeleft',function(ev) {
+                changePage({method:'L'});
+                console.log(ev);
+            })
+        }
+    </script>
+  </head>
+  <body>
+    <div class="views">
+      <div class="view view-main">
+        <div class="pages">
+          <div data-page="home" class="page">
+            <div class="mainShow" id="mainShow">
+                <div class="status" id="status">
+                    <span id="cal">cal</span>
+                    <span id="deg">rad</span>
+                </div>
+                <div id="formula">
+
+                </div>
+                <div id='formula-buffer'>
+                </div>
+                <div class="result" id="result">
+                   <span></span>
+                </div>
+            </div>
+            <div >
+                <div class="tabs">
+                    <div id="tab1" class="view tab active">
+                        <div class="keyboard" id="keyboard">
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-cyan">
+                                        <span>Shift</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">forward</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">chevron_up</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">reply</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-red" >
+                                        <span><i class="f7-icons">delete-round</i></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span> AC</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">chevron_left</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill">
+                                        <span><i class="f7-icons">chevron_down</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">chevron_right</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill open-popup" data-popup='.history' >
+                                        <span><i class="f7-icons">time</i></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span>$\mathrm{Cros}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{Dot}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{Det}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>$\mathrm{Eigen}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{Cramer}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$[\ \ \ ]^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$[\ \ \ ]^T$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sqrt[]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$($</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$)$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} Y}\ \ \ 7$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} Z}\ \ \ 8$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} M}\ \ \ 9$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$\times \ ^{\tiny {\color{silver} {X^{n}}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$\div \ ^{\tiny \color{silver}{\frac{\boxed{}}{\boxed{}}}}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F1}}\ \ \ 4$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F2}}\ \ \ 5$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F3}}\ \ \ 6$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$+ \ ^{\small {\color{silver} {C_n^k}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$- \ ^{\small {\color{silver}{P_{n}^{k}}}}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {GRP}}\ \ \ 1$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {FX}}\ \ \ 2$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {CCS}}\ \ \ 3$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$i \ ^{\small {\color{silver} ∠}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$=$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {\%}}\ \ \ 0$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {。,,}}\ \ \ .$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray">
+                                        <span class="supleft">$^{\tiny \color{silver} {e^x}}\ \ \ EE$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span class="supright">$\tiny{\#\longleftrightarrow\frac{\boxed{}}{\boxed{}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-blue">
+                                        <span class="supright">$=$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">menu</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">reload</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">add_round</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">fastforward</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab2" class="view tab">
+                        <div class="keyboard" id="keyboard">
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-cyan" >
+                                        <span>Shift</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span><i class="f7-icons">forward</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span><i class="f7-icons">chevron_up</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span><i class="f7-icons">reply</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-red" >
+                                        <span><i class="f7-icons">delete-round</i></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span> AC</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">chevron_left</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span><i class="f7-icons">chevron_down</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span><i class="f7-icons">chevron_right</i></span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill open-popup" data-popup='.history' >
+                                        <span><i class="f7-icons">time</i></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black " >
+                                        <span>$\mathrm{e}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\log$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>${\sin}^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>${\cos}^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>${\tan}^{-1}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^3$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sqrt[3]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$($</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$)$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} Y}\ \ \ 7$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} Z}\ \ \ 8$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} M}\ \ \ 9$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$x^n \ ^{\tiny {\color{silver} {\times}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$\frac{\boxed{}}{\boxed{}}\ ^{\tiny \color{silver}{\div}}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F1}}\ \ \ 4$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F2}}\ \ \ 5$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {F3}}\ \ \ 6$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$C_n^k \ ^{\small {\color{silver} {+}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$P_{n}^{k} \ ^{\small {\color{silver}{-}}}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {GRP}}\ \ \ 1$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {FX}}\ \ \ 2$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {CCS}}\ \ \ 3$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$∠ \ ^{\small {\color{silver}i}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span class="supright">$=$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {\%}}\ \ \ 0$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span class="supleft">$^{\tiny \color{silver} {。,,}}\ \ \ .$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray">
+                                        <span class="supleft">$^{\tiny \color{silver} {e^x}}\ \ \ EE$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span class="supright">$\tiny{\#\longleftrightarrow\frac{\boxed{}}{\boxed{}}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-blue">
+                                        <span class="supright">$=$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">menu</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">reload</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">add_round</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">fastforward</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab3" class="view tab">
+                        <div class="keyboard" id="keyboard">
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-cyan" >
+                                        <span>Shift</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>RAD</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>F(X)</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>Oxy</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>Graph</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$P_{n}^{k}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$C_{n}^{k}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>$F_1$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$F_2$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$F_3$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black " >
+                                        <span>$\sqrt[3]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sqrt[n]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sin$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>$\cos$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\tan$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^3$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^n$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sinh$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\cosh$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\tanh$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$r$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\theta$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{MOD}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{GCD}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{LCM}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$X!$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$e^x$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\log$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\int{}dx$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\delta /dx$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$X^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{e}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{Log_{A}^{B}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\Sigma x$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\Pi x$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$D$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$° '\ ''$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{NPr}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$|\ \ \ |$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span>,</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">menu</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">reload</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">add_round</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">fastforward</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab4" class="view tab">
+                        <div class="keyboard" id="keyboard">
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-cyan" >
+                                        <span>Shift</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span>RAD</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>F(X)</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill">
+                                        <span>Oxy</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill" >
+                                        <span>Graph</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$P_{n}^{k}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$C_{n}^{k}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>$F_1$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$F_2$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$F_3$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black " >
+                                        <span>$\sqrt[3]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sqrt[n]{}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sin^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img" >
+                                    <a class="button button-fill color-black">
+                                        <span>$\cos^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\tan^{-1}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^3$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$x^n$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\sinh^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\cosh^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\tanh^{-1}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$r$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\theta$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{MOD}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{GCD}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\mathrm{LCM}$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$X!$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$e^x$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\log$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\int{}dx$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\delta /dx$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$X^{-1}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{e}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$\mathrm{Log_{A}^{B}}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\Sigma x$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black" >
+                                        <span>$\Pi x$</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$D$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray" >
+                                        <span>$° '\ ''$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-gray">
+                                        <span>$\mathrm{NPr}$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span>$|\ \ \ |$</span>
+                                    </a>
+                                </div>
+                                <div class="col-20 button-img">
+                                    <a class="button button-fill color-black">
+                                        <span>,</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="row no-gutter">
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">menu</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">reload</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button">
+                                        <i class="f7-icons">add_round</i>
+                                    </a>
+                                </div>
+                                <div class="col-25">
+                                    <a class="button" >
+                                        <i class="f7-icons">fastforward</i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--history popup-->
+                    <div class="popup history">
+                        <div class="page-content">
+                            <div class='list-block'>
+                                <ul id="log_item">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="Framework7-1.4.2/dist/js/framework7.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript" src="js/math.js"></script>
+    <script type="text/javascript" src="js/myMath.js"></script>
+    <script type="text/javascript" src='js/matBind.js'></script>
+    <script type="text/javascript" src='js/matrix.js'></script>
+  </body>
+</html>
