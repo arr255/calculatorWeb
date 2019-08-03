@@ -229,16 +229,19 @@ function clearContent(){
     currentFormula="$"+cursor+"$";
     Already=true;
     reload();
+    $('#result').text('');
 }
 /* 删除
     参数：
     返回：无
 */
 function del(del=1){
-    var wholeSingnal=['{\\\\color{pink}x}','{\\\\color{pink}y}','{\\\\color{pink}z}','\\\\delta\\(',
+    var wholeSingnal=['\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
+    '{\\\\color{pink}x}','{\\\\color{pink}y}','{\\\\color{pink}z}','\\\\delta\\(',
         "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\\\div\\}",
         "[0-9]","\\.","\\\\pi","\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{",
-        "\\(","\\)","\\}",',']
+        "\\(","\\)","\\}",',',
+        '\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(']
     while(del>0){
         if(currentFormula.match(RegExp('\\\\delta\\('+regCursor+',.*?\\)'))){
             currentFormula=currentFormula.replace(RegExp('\\\\delta\\('+regCursor+',.*?\\)'),cursor);
@@ -351,9 +354,11 @@ function moveLeft(lm){
     if(Already){
         changed=true;
     }
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=['\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
+    "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
-                        ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[']
+                        ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[',
+                        '\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(']
     while(lm>0){
         for(i=0;i<wholeSingnal.length;i++){
             var reg=new RegExp("("+wholeSingnal[i]+")("+regCursor+")");
@@ -374,7 +379,8 @@ function moveRight(rm){
     if(Already){
         changed=true;
     }
-    var wholeSingnal=["\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\\\mid","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
+    var wholeSingnal=['\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
+                        "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\\\mid","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
                         ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[']
     while(rm>0){
@@ -514,15 +520,6 @@ function calculate(string){
     if(string.match(/^\d+\,\d+$/) && !string.match(/\[\[\d+\,\d+/)){
         return string;
     }
-    //矩阵
-    if(string.match(/\[\[\d/)) {
-        string=string.replace(/(\[\[.+?\]\])\-(\[\[.+?\]\])/,'math.subtract($1,$2)');
-        string=string.replace(/(\[\[.+?\]\])\+(\[\[.+?\]\])/,'math.add($1,$2)');
-        string=string.replace(/((\d|\.)+)\*(\[\[.+?\]\])/,'math.multiply($1,$3)');
-        string=string.replace(/(\[\[.+?\]\])\*((\d|\.)+)/,'math.multiply($1,$2)');
-        string=string.replace(/(\[\[.+?\]\])\/((\d|\.)+)/,'math.divide($1,$2)');
-        string=string.replace(/((\d|\.)+)\/(\[\[.+?\]\])/,'math.divide($1,$3)');
-    }
     console.log(string);
     var result;
     try {
@@ -533,27 +530,77 @@ function calculate(string){
             if(res) {
                 for(i=0;i<res.length;i++) {
                     console.log(res[i]);
-                    string=string.replace(res[i],eval(res[i]));
+                    try{
+                        string=string.replace(res[i],eval(res[i]));
+                    }
+                    catch(error) {
+                        console.log(error);
+                        return;
+                    }
                 }
+                // string=string.replace(/([\d|\.]+)\+([\d|\.]+)/g,'math.add($1,$2)')
+                // string=string.replace(/([\d|\.]+)\-([\d|\.]+)/g,'math.subtract($1,$2)')
+                // string=string.replace(/([\d|\.]+)\*([\d|\.]+)/g,'math.multiply($1,$2)')
+                // string=string.replace(/([\d|\.]+)\/([\d|\.]+)/g,'math.divide($1,$2)')
             }
             else {
                 console.log(string);
                 break;
             }
         }
-        var result=string;
+        //处理运算符
+        //矩阵
+        if(string.match(/\[\[\d/)) {
+            console.log(string);
+            string=string.replace(/(\[\[.+?\]\])\-(\[\[.+?\]\])/,'math.subtract($1,$2)');
+            string=string.replace(/(\[\[.+?\]\])\+(\[\[.+?\]\])/,'math.add($1,$2)');
+            string=string.replace(/((\d|\.)+)\*(\[\[.+?\]\])/,'math.multiply($1,$3)');
+            string=string.replace(/(\[\[.+?\]\])\*((\d|\.)+)/,'math.multiply($1,$2)');
+            string=string.replace(/(\[\[.+?\]\])\/((\d|\.)+)/,'math.divide($1,$2)');
+            string=string.replace(/((\d|\.)+)\/(\[\[.+?\]\])/,'math.divide($1,$3)');
+            string=string.replace(/(\[\[.+?\]\])\\color\{yellow\}\\times(\[\[.+?\]\])/g,'math.cross($1,$2)');
+            string=string.replace(/(\[\[.+?\]\])\\color\{yellow\}\\cdot(\[\[.+?\]\])/g,'math.dotMultiply($1,$2)');
+            string=string.replace(/(\[\[.+?\]\])\*(\[\[.+?\]\])/g,'math.multiply($1,$2)');
+            console.log(string);
+        }
+        console.log('FinalStep:'+string);
+        result=eval(string);
     }
     catch(error) {
+        alert('错误');
         console.log(error);
     };
-    
-    ApproResult=math.round(parseFloat(result),7);
-    if(ApproResult){
-        result=ApproResult;
+    if(typeof(result)=='object') {
+        console.log(result);
+        $('#result').css('font-size','20px')
+        var row=result.length;
+        var column=result[0].length;
+        var mat='\\tiny{\\left[\\begin{matrix}';
+        for(m=0;m<row;m++) {
+            for(n=0;n<column;n++) {
+                if(n!=column-1) {
+                    mat+='['+result[m][n]+']&';
+                }
+                else {
+                    mat+='['+result[m][n]+'] \\\\ '
+                }
+            }
+        }
+        mat+='\\end{matrix}\\right]}';
+        result=mat;
+        console.log(result)
+        return ('$'+result+'$');
     }
-    else{
-        var reg = new RegExp('"',"g");
-        result=String(result).replace(reg,"")
+    else {
+        $('#result').css('font-size','48px')
+        ApproResult=math.round(parseFloat(result),7);
+        if(ApproResult){
+            result=ApproResult;
+        }
+        else{
+            var reg = new RegExp('"',"g");
+            result=String(result).replace(reg,"")
+        }   
     }
     return ApproResult;
 }
@@ -594,8 +641,7 @@ function mainCalculate(formula){
     }
     formula=handleFactorial(formula);
     var finalResult=calculate(formula);
-    console.log(typeof(finalResult));
-    $$("#result").text(finalResult);
+    $$("#result").text('$'+finalResult+'$');
     if(math.isNumeric(parseFloat(finalResult))) {
         localStorage.setItem('lastResult',finalResult);
     }
@@ -607,6 +653,7 @@ function mainCalculate(formula){
         currentLog+=1;
         addData(logFormula,finalResult);
     }
+    reload();
 }
 /*
     handleConst(formula):常数处理,将pi、e变为数字，便于后续处理
@@ -656,7 +703,7 @@ function handleString(str){
     str=str.replace(/\$/g,"");
     //删除下划线
     str=str.replace(/\\underline\{(.+?)\}/,"$1");
-    //处理加减乘除
+    // //处理加减乘除
     str=str.replace(/\\mathrm{\\times}/g,"*");
     str=str.replace(/\\mathrm{\\div}/g,"/");
     //排列组合处理
@@ -667,24 +714,35 @@ function handleString(str){
     str=str.replace(/\\mathrm\{\-\}/g,"-");//替换减号；
     str=str.replace(/\\pi/g,3.14159265359);//替换PI
     str=str.replace(/\\mathrm\{e\}/g,"2.718281828459");//替换自然对数E；
-    str=str.replace(/\\times/g,"*");
-    str=str.replace(/\\div/,"/");
+    // str=str.replace(/(^(\{yellow\}))\\times/g,"*");
+    // str=str.replace(/\\div/,"/");
     //三角函数处理
     if(degMode=="rad"){
         str=str.replace(/\\sin\(/g,"math.sin(");
-        str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
-        str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
-        str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
-        str=str.replace(/(\\arccos\()(.+?)\)/g,"math.acos($2)");
-        str=str.replace(/(\\arctan\()(.+?)\)/g,"math.atan($2)");
+        // str=str.replace(/(\\cos\()(.+?)\)/g,"math.cos($2)");
+        // str=str.replace(/(\\tan\()(.+?)\)/g,"math.tan($2)");
+        // str=str.replace(/(\\arcsin\()(.+?)\)/g,"math.asin($2)");
+        // str=str.replace(/(\\arccos\()(.+?)\)/g,"math.acos($2)");
+        // str=str.replace(/(\\arctan\()(.+?)\)/g,"math.atan($2)");
+        str=str.replace(/\\cos\(/g,"math.cos(");
+        str=str.replace(/\\tan\(/g,"math.tan(");
+        str=str.replace(/\\arcsin\(/g,"math.asin(");
+        str=str.replace(/\\arccos\(/g,"math.acos(");
+        str=str.replace(/\\arctan\(/g,"math.atan(");
     }
     else if(degMode=="deg"){
-        str=str.replace(/(\\sin\()(.+?)\)/g,"dsin($2)");
-        str=str.replace(/(\\cos\()(.+?)\)/g,"dcos($2)");
-        str=str.replace(/(\\tan\()(.+?)\)/g,"dtan($2)");
-        str=str.replace(/(\\arcsin\()(.+?)\)/g,"dasin($2)");
-        str=str.replace(/(\\arccos\()(.+?)\)/g,"dacos($2)");
-        str=str.replace(/(\\arctan\()(.+?)\)/g,"datan($2)");
+        // str=str.replace(/(\\sin\()(.+?)\)/g,"dsin($2)");
+        // str=str.replace(/(\\cos\()(.+?)\)/g,"dcos($2)");
+        // str=str.replace(/(\\tan\()(.+?)\)/g,"dtan($2)");
+        // str=str.replace(/(\\arcsin\()(.+?)\)/g,"dasin($2)");
+        // str=str.replace(/(\\arccos\()(.+?)\)/g,"dacos($2)");
+        // str=str.replace(/(\\arctan\()(.+?)\)/g,"datan($2)");
+        str=str.replace(/\\sin\(/g,"math.dsin(");
+        str=str.replace(/\\cos\(/g,"math.dcos(");
+        str=str.replace(/\\tan\(/g,"math.dtan(");
+        str=str.replace(/\\arcsin\(/g,"math.dasin(");
+        str=str.replace(/\\arccos\(/g,"math.dacos(");
+        str=str.replace(/\\arctan\(/g,"math.datan(");
     }
     str=str.replace(/(\\sinh\^\{-1\}\()(.+?)\)/g,"math.asinh($2)");
     str=str.replace(/(\\cosh\^\{-1\}\()(.+?)\)/g,"math.acosh($2)");
@@ -1044,7 +1102,6 @@ function plotBtn() {
 
 function plot(Fx,expr) {
     expr=LatexTostr(expr);
-    var href='plot.html?'+Fx+'='+expr;
     localStorage.setItem(Fx+'Expr',expr);
     localStorage.setItem('currentMode',mainMode);
     window.location.href='plot.html?'+encodeURI(Fx+'='+expr);
@@ -1074,10 +1131,16 @@ function reload(){
     // $$("#formula").text(currentFormula);
     // $$("#formula").css("opacity",'0');
     formulaBuffer.innerHTML=currentFormula;
-    $$("#result").text('');
+    //$$("#result").text('');
     // $$('#formula-buffer').text(currentFormula);
     // MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
     MathJax.Hub.Queue(["Typeset", MathJax.Hub,formulaBuffer],function () {
+        // $$("#formula").css("opacity",1);
+        
+      });
+    
+    var result=document.getElementById('result');
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub,result],function () {
         // $$("#formula").css("opacity",1);
         
       });
@@ -1126,6 +1189,12 @@ function handleMatrix(expr) {
             arr=arr.replace(/\,$/,'');
             arr+=']'
             expr=expr.replace(matrixExpr,String(arr));
+            expr=expr.replace(/Det\((\[\[.+?\]\])\)/g,'math.det($1)');
+            expr=expr.replace(/Eigen\((\[\[.+?\]\])\)/g,'eigen($1)');
+            expr=expr.replace(/Crr\((\[\[.+?\]\])\)/g,'cramer($1)');
+            expr=expr.replace(/Inv\((\[\[.+?\]\])\)/g,'myInv($1)');
+            expr=expr.replace(/Inv\((\[\[.+?\]\])\)/g,'myInv($1)');
+            expr=expr.replace(/Tr\((\[\[.+?\]\])\)/g,'myTranspose($1)');
         }
         return expr;
     }

@@ -216,3 +216,89 @@ function handleToPy(expr){
     console.log(expr);
     return expr;
 }
+
+function arrayToStr(arr) {
+    str='[['
+    for(row=0;row<arr.length;row++) {
+        for(column=0;column<arr[0].length;column++) {
+            str+=String(arr[row][column]);
+            if(column!=arr[0].length-1) {
+                str+=','
+            }
+        }
+        if(row!=arr.length-1) {
+            str+='],['
+        }
+    }
+    str+=']]'
+    return str;
+}
+
+function eigen(arr) {
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/eigen",
+        method:"get",
+        data:{"arr":arrayToStr(arr)},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res='['+data.result+']';
+            console.log(res);
+        },
+        error:function(){
+            res="";
+        }
+    })
+    console.log(res);
+    return res;
+}
+
+function cramer(arr) {
+    var arr1='[[';
+    var arr2='[';
+    var row=arr.length;
+    var column=arr[0].length;
+    for(m=0;m<row;m++) {
+        for(n=0;n<column;n++) {
+            if(n<column-2) {
+                arr1+=arr[m][n]+',';
+            }
+            else if(n==column-2) {
+                arr1+=arr[m][n]+']';
+            }
+            else {
+                arr2+='['+arr[m][n]+']';
+            }
+        }
+        if(m!=row-1) {
+            arr1+=',['; 
+            arr2+=',';
+        }
+    }
+    arr1+=']';
+    arr2+=']';
+    console.log(arr1);
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/cramer",
+        method:"get",
+        data:{"arr1":arr1,"arr2":arr2},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res='['+data.result+']';
+            console.log(res);
+        },
+        error:function(){
+            res="";
+        }
+    })
+    console.log(res);
+    return res;
+}
+
+function myInv(arr) {
+    return arrayToStr(math.inv(arr));
+}
+function myTranspose(arr) {
+    return arrayToStr(math.transpose(arr));
+}
