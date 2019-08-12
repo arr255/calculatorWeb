@@ -767,7 +767,34 @@ function handleString(str){
     str=str.replace(/([\d|\.]+)\^\{\\circ\}([\d|\.]+)\^\{\\circ\}/g,"degreeToNumber({'deg':$1,'min':$2})");
     str=str.replace(/([\d|\.]+)\^\{\\circ\}/g,"degreeToNumber({'deg':$1})");
     str=str.replace(/Npr/g,"Npr");
-    str=str.replace(/\\mid\{(.+?)\}\\mid/,"math.abs($1)")
+    str=str.replace(/\\mid\{(.+?)\}\\mid/,"math.abs($1)");
+    //复数
+    var mainMode=localStorage.getItem('mainMode');
+    if(mainMode=='CMX') {
+        var s=str.match(/(\d|\.)+/g);
+        for(i=0;i<s.length;i++) {
+            var k=s[i];
+            if(math.isNumeric(parseFloat(k))) {
+                str=str.replace(k,'math.complex('+k+','+'0)');
+            }
+        }
+        str=str.replace(/(\\color\{yellow\}\{i\})/g,'math.complex(0,1)'); //转换i
+        console.log(str);
+        str=handleComplexStd(str);
+        console.log(str);
+        var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-|\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
+        if(str.match(reg)) {
+            var s=RegExp.$1.replace(/^\(/,'').replace(/\)$/,'');
+            str=str.replace(reg,handleComplexStd(s));
+            console.log(str);
+        }
+        var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
+        if(str.match(reg)) {
+            str=str.replace(reg,RegExp.$1);
+        }
+        console.log(str);
+        str=handleComplexStd(str);
+    }
     return str;
 }
 
@@ -896,6 +923,14 @@ function changeMode() {
             }
         },
         {
+            text:'复数',
+            onClick:function() {
+                mainMode='CMX';
+                setMainMode('CMX');
+                window.location.href='complex.html';
+            }
+        },
+        {
             text: '取消',
             color: 'red'
         },
@@ -904,6 +939,7 @@ function changeMode() {
 }
 
 function changeMainMode() {
+    mainMode=mainMode;
     var mainMode=localStorage.getItem('mainMode');
     if(!mainMode) {
         localStorage.setItem('mainMode','CAL');
@@ -1202,4 +1238,46 @@ function handleMatrix(expr) {
         return expr;
     }
 
+}
+/**
+ * 
+ * 处理复数四则运算
+ * @param {expr} str 
+ */
+function handleComplexStd(str) {
+    var reg=RegExp(/(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))/);
+    while(str.match(reg)) {  //转换k*math.complex() k/math.complex()
+        var a=parseFloat(RegExp.$2);
+        var b=parseFloat(RegExp.$3);
+        var c=parseFloat(RegExp.$6);
+        var d=parseFloat(RegExp.$7);
+        if(RegExp.$4=='*') {
+            var re=a*c-b*d;
+            var im=a*d+b*c;
+            str=str.replace(reg,'math.complex('+re+','+im+')');
+        }
+        else if(RegExp.$4=='/') {
+            var re=(a*c+b*d)/(c*c+d*d);
+            var im=(b*c-a*d)/(c*c+d*d);
+            str=str.replace(reg,'math.complex('+re+','+im+')');
+        }
+    }
+    var reg=RegExp(/(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))/);
+    while(str.match(reg)) {  //转换k*math.complex() k/math.complex()
+        var a=parseFloat(RegExp.$2);
+        var b=parseFloat(RegExp.$3);
+        var c=parseFloat(RegExp.$6);
+        var d=parseFloat(RegExp.$7);
+        if(RegExp.$4=='+') {
+            var re=a+c;
+            var im=b+d;
+            str=str.replace(reg,'math.complex('+re+','+im+')');
+        }
+        else if(RegExp.$4=='-') {
+            var re=a-c;
+            var im=b-d;
+            str=str.replace(reg,'math.complex('+re+','+im+')');
+        }
+    }
+    return str;
 }
