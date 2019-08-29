@@ -1300,7 +1300,7 @@ function handleMatrix(expr) {
             expr=expr.replace(/Eigen\((\[\[.+?\]\])\)/g,'eigen($1)');
             expr=expr.replace(/Crr\((\[\[.+?\]\])\)/g,'cramer($1)');
             expr=expr.replace(/Inv\((\[\[.+?\]\])\)/g,'myInv($1)');
-            expr=expr.replace(/Inv\((\[\[.+?\]\])\)/g,'myInv($1)');
+            // expr=expr.replace(/Inv\((\[\[.+?\]\])\)/g,'myInv($1)');
             expr=expr.replace(/Tr\((\[\[.+?\]\])\)/g,'myTranspose($1)');
         }
         return expr;
