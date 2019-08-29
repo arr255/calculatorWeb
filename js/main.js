@@ -26,8 +26,8 @@ var formulaBuffer;
 var formulaPreview;
 var ifpending=false;
 var btnTimer;
-
 var testPara;
+var apiInterface='localhost:12345';
 init();
 LogDBInit();
 /*
@@ -354,7 +354,8 @@ function moveLeft(lm){
     if(Already){
         changed=true;
     }
-    var wholeSingnal=['\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
+    var wholeSingnal=['\\}\\}\\(',
+        '\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
     "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
                         ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[',
@@ -379,7 +380,8 @@ function moveRight(rm){
     if(Already){
         changed=true;
     }
-    var wholeSingnal=['\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
+    var wholeSingnal=['\\}\\}\\(',
+        '\\^\\{T\\}','\\\\color{yellow}\\\\times','\\\\cdot','Det\\(','Eigen\\(','Cramer\\(','Inv\\(',
                         "\\\\mathrm\\{\\+\\}","\\\\mathrm\\{\\-\\}","\\\\mathrm\\{\\\\times\\}","\\\\mathrm\\{\\div\\}","dx",",","\\]\\{","\\}\\\\mid","\\}\\(","\\}\\{","\\}\\^\\{","[0-9]","\\.","\\\\pi",
                         "\\\\ln\\(","\\\\sin\\(","\\\\cos\\(","\\\\tan\\(","\\^\\{","\\\\sqrt\\[2]\\{\\\\underline\\{","\\\\sqrt\\[2]\\{","\\(","\\)","\\}",
                         ']\\&\\[','] \\\\\\\\ \\[','] \\\\\\\\ \\\\end\\{matrix}\\\\right]}','\\\\tiny\\{\\\\left\\[\\\\begin\\{matrix}\\[']
@@ -522,6 +524,51 @@ function calculate(string){
     }
     console.log(string);
     var result;
+    if(localStorage.getItem('mainMode')=='CMX') {
+        console.log(string)
+        string=handleToCMXPy(string);
+        string=calCMX(string);
+        return string;
+    }
+    if(localStorage.getItem('mainMode')=='ALG') {
+        try {
+            string=handleBrackets(string);
+            console.log(string);
+            if(string.match(/limInf/g)) {
+                var n=string.match(/limInf/g).length;
+                for(i=0;i<n;i++) {
+                    string.match(/limInf\[(.+?)\]/);
+                    if(RegExp.$1) {
+                        var signal=RegExp.$1;
+                        var reg=RegExp('limInf\\\[(.+?)\\\]\\\((.+?)\\\['+signal+'\\\]\\\)');
+                        string.match(reg);
+                        string=string.replace(reg,'limInf("'+RegExp.$2+'")');
+                    }
+                }
+                string=string.replace(/\[\d\]/g,'');
+                console.log(string);
+            }
+            if(string.match(/limMInf/g)) {
+                var n=string.match(/limMInf/g).length;
+                for(i=0;i<n;i++) {
+                    string.match(/limMInf\[(.+?)\]/);
+                    if(RegExp.$1) {
+                        var signal=RegExp.$1;
+                        var reg=RegExp('limMInf\\\[(.+?)\\\]\\\((.+?)\\\['+signal+'\\\]\\\)');
+                        string.match(reg);
+                        string=string.replace(reg,'limMInf("'+RegExp.$2+'")');
+                    }
+                }
+                string=string.replace(/\[\d\]/g,'');
+                console.log(string);
+            }
+            string=eval(string);
+            return string;
+        }
+    catch(error) {
+        console.log(error);
+    }
+}
     try {
         // var result=eval(string);
         //最外层函数
@@ -564,6 +611,9 @@ function calculate(string){
             console.log(string);
         }
         console.log('FinalStep:'+string);
+        if(localStorage.getItem('mainMode')=='CMX') {
+            return string;
+        }
         result=eval(string);
     }
     catch(error) {
@@ -620,8 +670,8 @@ function mainCalculate(formula){
     logFormula=formula;
     formula=strPreHandle(formula);
     //第三次处理，添加标号
-    string=handleBrackets(formula);
-    formula=handleBrackets(formula);
+    // string=handleBrackets(formula);
+    // formula=handleBrackets(formula);
     //maxBrackets=0;
     for(var i=maxBrackets;i>=0;i--){
         //字符串需要加上双重转义字符
@@ -698,6 +748,13 @@ function handleBrackets(formula){
     用于计算式字符串的处理，以便于之后的计算
 */
 function handleString(str){
+    
+    //处理微积分
+    if(localStorage.getItem('mainMode')=='ALG') {
+        str=str.replace(/\{\\lim\\limits\_\{x\\to\+\\infty}}/g,'limInf');
+        str=str.replace(/\{\\lim\\limits\_\{x\\to\-\\infty}}/g,'limMInf');
+        str=str.replace(/\{\\color\{pink\}x\}/g,'x');
+    }
     //删除光标
     str=str.replace(cursor,"");
     str=str.replace(/\$/g,"");
@@ -754,6 +811,7 @@ function handleString(str){
     //third row
     str=str.replace(/(\\ln\()(.+?)(\))/g,"math.log($2,math.e)");
     //fourth row
+    str=str.replace(/([\d|\.]+)\)?\^\{?\(?(\-?[\d|\.]+)\)?\}?/g,"math.pow($1,$2)");
     str=str.replace(/\(?([\d|\.]+)\)?\^\{?\(?(\-?[\d|\.]+)\)?\}?/g,"math.pow($1,$2)");
     str=str.replace(/\\sqrt\[(.+?)\]\{(.+?)\}/g,"math.nthRoot($2,$1)");
     //fifth row
@@ -771,29 +829,34 @@ function handleString(str){
     //复数
     var mainMode=localStorage.getItem('mainMode');
     if(mainMode=='CMX') {
-        var s=str.match(/(\d|\.)+/g);
-        for(i=0;i<s.length;i++) {
-            var k=s[i];
-            if(math.isNumeric(parseFloat(k))) {
-                str=str.replace(k,'math.complex('+k+','+'0)');
-            }
-        }
-        str=str.replace(/(\\color\{yellow\}\{i\})/g,'math.complex(0,1)'); //转换i
-        console.log(str);
-        str=handleComplexStd(str);
-        console.log(str);
-        var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-|\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
-        if(str.match(reg)) {
-            var s=RegExp.$1.replace(/^\(/,'').replace(/\)$/,'');
-            str=str.replace(reg,handleComplexStd(s));
-            console.log(str);
-        }
-        var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
-        if(str.match(reg)) {
-            str=str.replace(reg,RegExp.$1);
-        }
-        console.log(str);
-        str=handleComplexStd(str);
+        // var s=str.match(/(\d|\.)+/g);
+        // for(i=0;i<s.length;i++) {
+        //     var k=s[i];
+        //     if(math.isNumeric(parseFloat(k))) {
+        //         str=str.replace(k,'math.complex('+k+','+'0)');
+        //     }
+        // }
+        // str=str.replace(/(\\color\{yellow\}\{i\})/g,'math.complex(0,1)'); //转换i
+        // console.log(str);
+        // //处理括号内
+        // str=handleComplexStd(str);
+        // console.log(str);
+        // var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-|\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
+        // if(str.match(reg)) {
+        //     var s=RegExp.$1.replace(/^\(/,'').replace(/\)$/,'');
+        //     str=str.replace(reg,handleComplexStd(s));
+        //     console.log(str);
+        // }
+        // var reg=RegExp(/\((math.complex\(([\d|\.]+)\,([\d|\.]+)\))\)/);
+        // if(str.match(reg)) {
+        //     str=str.replace(reg,RegExp.$1);
+        // }
+        // console.log(str);
+        // str=handleComplexStd(str);
+        // console.log(str);
+    }
+    if(localStorage.getItem('mainMode')=='ALG') {
+        str=handleToALGPy(str);
     }
     return str;
 }
@@ -928,6 +991,14 @@ function changeMode() {
                 mainMode='CMX';
                 setMainMode('CMX');
                 window.location.href='complex.html';
+            }
+        },
+        {
+            text:'微积分',
+            onClick:function() {
+                mainMode='ALG';
+                setMainMode('ALG');
+                window.location.href='algebra.html';
             }
         },
         {
@@ -1245,7 +1316,13 @@ function handleMatrix(expr) {
  * @param {expr} str 
  */
 function handleComplexStd(str) {
-    var reg=RegExp(/(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))/);
+    //转换bi
+    var reg=RegExp(/(math.complex\(([\d|\.]+)\,(0)\))[^\)]?[^\(]?(math.complex\((0)\,(1)\))/);
+    while(str.match(reg)) {
+        var b=parseFloat(RegExp.$2);
+        str=str.replace(reg,'math.complex(0,'+b+')');
+    }
+    var reg=RegExp(/[\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\*|\/])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[\)]?/);
     while(str.match(reg)) {  //转换k*math.complex() k/math.complex()
         var a=parseFloat(RegExp.$2);
         var b=parseFloat(RegExp.$3);
@@ -1262,7 +1339,7 @@ function handleComplexStd(str) {
             str=str.replace(reg,'math.complex('+re+','+im+')');
         }
     }
-    var reg=RegExp(/(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))/);
+    var reg=RegExp(/[\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\))[^\)]?([\+|\-])[^\(]?(math.complex\(([\d|\.]+)\,([\d|\.]+)\)[\)]?)/);
     while(str.match(reg)) {  //转换k*math.complex() k/math.complex()
         var a=parseFloat(RegExp.$2);
         var b=parseFloat(RegExp.$3);
@@ -1279,5 +1356,39 @@ function handleComplexStd(str) {
             str=str.replace(reg,'math.complex('+re+','+im+')');
         }
     }
+    return str;
+}
+
+function handleToCMXPy(str) {
+    console.log(str);
+    str=str.replace(/\\color\{yellow\}\{i\}/g,'j');
+    var reg=RegExp(/[^\d]j/)
+    if(str.match(reg)) {
+        expr=expr.replace(reg,RegExp.$1+'1j');
+    }
+    reg=RegExp(/math\.nthRoot\((.+?)\,2/g)
+    if(str.match(reg)) {
+        str=str.replace(reg,'cmath.sqrt('+RegExp.$1);
+    }
+    str=str.replace(/math\.log/g,'cmath.log');
+    str=str.replace(/math\.sin/g,'cmath.sin');
+    str=str.replace(/math\.cos/g,'cmath.cos');
+    str=str.replace(/math\.tan/g,'cmath.tan');
+    str=str.replace(/math\.asin/g,'cmath.asin');
+    str=str.replace(/math\.acos/g,'cmath.acos');
+    str=str.replace(/math\.atan/g,'cmath.atan');
+    return str;
+}
+
+function handleToALGPy(str) {
+    str=str.replace(/math\.log/g,'log');
+    str=str.replace(/math\.sin/g,'sin');
+    str=str.replace(/math\.cos/g,'cos');
+    str=str.replace(/math\.tan/g,'tan');
+    str=str.replace(/math\.asin/g,'asin');
+    str=str.replace(/math\.acos/g,'acos');
+    str=str.replace(/math\.atan/g,'atan');
+    str=str.replace(/math\.divide/,'divide');
+    str=str.replace(/\^\{(.+?)\}/g,'**$1');
     return str;
 }

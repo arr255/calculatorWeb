@@ -213,7 +213,7 @@ function handleToPy(expr){
     expr=expr.replace(/mathrm\{div\}/g,"/");
     expr=expr.replace(/mathrm\{\times\}/g,"*");
     expr=expr.replace(/mathrm\{-\}/g,"-");
-    console.log(expr);
+    var reg=RegExp(/([^\d])j/g);
     return expr;
 }
 
@@ -301,4 +301,61 @@ function myInv(arr) {
 }
 function myTranspose(arr) {
     return arrayToStr(math.transpose(arr));
+}
+
+function calCMX(str) {
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/cal_cmx",
+        method:"get",
+        data:{"formula":str},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res=data.result;
+            console.log(res);
+        },
+        error:function(){
+            res="";
+        }
+    })
+    res=res.replace(/j/g,'i').replace(/\(/g,'').replace(/\)/g,'');
+    res=res.replace(/1i/g,'i');
+    console.log(res);
+    return res;
+}
+
+function limInf(str) {
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/lim_inf",
+        method:"get",
+        data:{"formula":str},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res=data.result;
+            console.log(res);
+        },
+        error:function(){
+            res="";
+        }
+    })
+    return res;
+}
+function limMInf(str) {
+    $$.ajax({
+        url:"http://www.guomf.top:8002/calPage/lim_m_inf",
+        method:"get",
+        data:{"formula":str},
+        async:false,
+        dataType:"json",
+        success:function(data){
+            res=data.result;
+            console.log(res);
+        },
+        error:function(){
+            res="";
+        }
+    })
+    console.log(res);
+    return res;
 }
